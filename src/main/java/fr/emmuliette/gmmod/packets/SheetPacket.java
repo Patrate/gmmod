@@ -1,10 +1,8 @@
-package fr.emmuliette.gmmod.characterSheet;
-
-
+package fr.emmuliette.gmmod.packets;
 
 import java.util.function.Supplier;
 
-import net.minecraft.client.Minecraft;
+import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -17,7 +15,7 @@ public class SheetPacket {
 	}
 
 	public static void encode(SheetPacket msg, FriendlyByteBuf buf) {
-		buf.writeNbt((CompoundTag) msg.nbt);
+		buf.writeNbt(msg.nbt);
 	}
 
 	public static SheetPacket decode(FriendlyByteBuf buf) {
@@ -26,12 +24,9 @@ public class SheetPacket {
 
 	public static class Handler {
 		public static void handle(final SheetPacket msg, Supplier<NetworkEvent.Context> ctx) {
-//			System.out.println("HANDLING PACKET");
-			Minecraft minecraft = Minecraft.getInstance();
-
 			ctx.get().enqueueWork(() -> {
-				minecraft.player.getCapability(SheetCapability.SHEET_CAPABILITY).ifPresent(cap -> cap.fromNBT(msg.nbt));
-
+				PacketHandler.minecraft.player.getCapability(CharacterSheet.SHEET_CAPABILITY)
+						.ifPresent(cap -> cap.deserializeNBT(msg.nbt));
 			});
 			ctx.get().setPacketHandled(true);
 		}
