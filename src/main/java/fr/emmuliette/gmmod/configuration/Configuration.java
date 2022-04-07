@@ -9,10 +9,10 @@ public class Configuration {
 	public static final Common COMMON;
 	public static final ForgeConfigSpec COMMON_SPEC;
 
-	public static final Common SERVER;
+	public static final Server SERVER;
 	public static final ForgeConfigSpec SERVER_SPEC;
 
-	public static final Common CLIENT;
+	public static final Client CLIENT;
 	public static final ForgeConfigSpec CLIENT_SPEC;
 
 	static // constructor
@@ -21,11 +21,11 @@ public class Configuration {
 		COMMON = commonSpecPair.getLeft();
 		COMMON_SPEC = commonSpecPair.getRight();
 
-		Pair<Common, ForgeConfigSpec> serverSpecPair = new ForgeConfigSpec.Builder().configure(Common::new);
+		Pair<Server, ForgeConfigSpec> serverSpecPair = new ForgeConfigSpec.Builder().configure(Server::new);
 		SERVER = serverSpecPair.getLeft();
 		SERVER_SPEC = serverSpecPair.getRight();
 
-		Pair<Common, ForgeConfigSpec> clientSpecPair = new ForgeConfigSpec.Builder().configure(Common::new);
+		Pair<Client, ForgeConfigSpec> clientSpecPair = new ForgeConfigSpec.Builder().configure(Client::new);
 		CLIENT = clientSpecPair.getLeft();
 		CLIENT_SPEC = clientSpecPair.getRight();
 	}

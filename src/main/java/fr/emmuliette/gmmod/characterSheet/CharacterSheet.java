@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.emmuliette.gmmod.GmMod;
-import fr.emmuliette.gmmod.characterSheet.stats.HealthRegen;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.Armor;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.ArmorToughness;
@@ -18,6 +17,7 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.KnockbackResistance;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
+import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
 import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
 import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import fr.emmuliette.gmmod.jobs.Job;

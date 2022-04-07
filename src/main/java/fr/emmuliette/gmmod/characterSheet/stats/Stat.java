@@ -17,6 +17,7 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.KnockbackResistance;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
+import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
