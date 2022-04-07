@@ -14,6 +14,7 @@ import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -27,31 +28,25 @@ public class StatCommand {
 		dispatcher.register(Commands.literal("stats").then(Commands.literal("list").executes((command) -> {
 			return listStats(command.getSource());
 		})).then(Commands.literal("set")
-				.then(Commands.argument("targets", EntityArgument.players())
-						.then(Commands.argument("stat", new StatArgument())
-								.then(Commands.argument("amount", DoubleArgumentType.doubleArg())
-										/*
-										 * .then(Commands.createValidator(new ParseFunction() {
-										 * 
-										 * @Override public void parse(StringReader p_82161_) throws
-										 * CommandSyntaxException {
-										 * 
-										 * } }))
-										 */
-
-										.executes((command) -> {
-											return setStat(command.getSource(),
-													EntityArgument.getPlayers(command, "targets"),
-													StatArgument.getStat(command, "stat"),
-													DoubleArgumentType.getDouble(command, "amount"));
-										})))))
-				.then(Commands.literal("get")
-						.then(Commands.argument("target", EntityArgument.player()).executes((command) -> {
-							return getStat(command.getSource(), EntityArgument.getPlayer(command, "target"));
-						}).then(Commands.argument("stat", new StatArgument()).executes((command) -> {
-							return getStat(command.getSource(), EntityArgument.getPlayer(command, "target"),
-									StatArgument.getStat(command, "stat"));
-						})))));
+				.then(Commands.argument("targets", EntityArgument.players()).then(Commands
+						.argument("stat", new StatArgument())
+						.then(Commands.argument("amount", DoubleArgumentType.doubleArg()).suggests((command, text) -> {
+							return SharedSuggestionProvider.suggest(StatArgument.getStatList(), text);
+						}).executes((command) -> {
+							return setStat(command.getSource(), EntityArgument.getPlayers(command, "targets"),
+									StatArgument.getStat(command, "stat"),
+									DoubleArgumentType.getDouble(command, "amount"));
+						})))))
+				.then(Commands.literal("get").executes((command) -> {
+					return getStat(command.getSource());
+				}).then(Commands.argument("target", EntityArgument.player()).executes((command) -> {
+					return getStat(command.getSource(), EntityArgument.getPlayer(command, "target"));
+				}).then(Commands.argument("stat", new StatArgument()).suggests((command, text) -> {
+					return SharedSuggestionProvider.suggest(StatArgument.getStatList(), text);
+				}).executes((command) -> {
+					return getStat(command.getSource(), EntityArgument.getPlayer(command, "target"),
+							StatArgument.getStat(command, "stat"));
+				})))));
 	}
 
 	private static int listStats(CommandSourceStack context) {
@@ -100,6 +95,15 @@ public class StatCommand {
 		}
 	}
 
+	private static int getStat(CommandSourceStack context) {
+		try {
+			return getStat(context, context.getPlayerOrException(), null);
+		} catch (CommandSyntaxException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
 	private static int getStat(CommandSourceStack context, ServerPlayer target) {
 		return getStat(context, target, null);
 	}
@@ -113,7 +117,8 @@ public class StatCommand {
 		StringBuilder result = new StringBuilder();
 		if (stat == null) {
 			for (Stat s : sheet.getStats()) {
-				result.append(s.getClass().getSimpleName() + " " + s.getValue() + "\n");
+				if (s.getValue() != 0)
+					result.append(s.getClass().getSimpleName() + " " + s.getValue() + "\n");
 			}
 		} else {
 			try {

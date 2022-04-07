@@ -18,6 +18,7 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
+import fr.emmuliette.gmmod.characterSheet.stats.gmmod.StrongStomach;
 import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
 import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import fr.emmuliette.gmmod.jobs.Job;
@@ -83,6 +84,7 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			addStat(MovementSpeed.class);
 
 			addStat(HealthRegen.class);
+			addStat(StrongStomach.class);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -177,6 +179,10 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		for (String key : statsTag.getAllKeys()) {
 			try {
 				Class<? extends Stat> statClass = Stat.getStat(key);
+				if (statClass == null) {
+					GmMod.logger().warn("statClass is null for key " + key);
+					continue;
+				}
 				if (!this.stats.containsKey(statClass)) {
 					GmMod.logger().warn("ADDING MISSING STAT " + key);
 					this.addStat(statClass);

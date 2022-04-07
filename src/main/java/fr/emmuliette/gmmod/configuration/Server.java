@@ -5,10 +5,11 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class Server {
 	private static final boolean defaultCreativeGM = true;
-	private static final double defaultDefaultRegenTimer = 10., defaultRegenLevelStep = 1.;
+	private static final double defaultDefaultRegenTimer = 10., defaultRegenLevelStep = 1.,
+			defaultStrongStomachMax = 1.5;
 
 	public final ConfigValue<Boolean> creativeGM;
-	public final ConfigValue<Double> defaultRegenTimer, regenLevelStep;
+	public final ConfigValue<Double> defaultRegenTimer, regenLevelStep, strongStomachMax;
 
 	public Server(ForgeConfigSpec.Builder builder) {
 		builder.push("Game Master");
@@ -22,6 +23,8 @@ public class Server {
 				.define("At level 1, heal every _ seconds", defaultDefaultRegenTimer);
 		this.regenLevelStep = builder.comment("How many seconds are shaved of for each regen level")
 				.define("Every level make regen _ seconds faster", defaultRegenLevelStep);
+		this.strongStomachMax = builder.comment("What's the max food bonus for strong stomach stat ?")
+				.define("At level 10, food input is multiplied by _", defaultStrongStomachMax);
 		builder.pop();
 	}
 }
