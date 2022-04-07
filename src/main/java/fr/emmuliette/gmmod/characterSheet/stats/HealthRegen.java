@@ -1,70 +1,61 @@
 package fr.emmuliette.gmmod.characterSheet.stats;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.emmuliette.gmmod.GmMod;
-import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import fr.emmuliette.gmmod.characterSheet.SheetTickEvent;
+import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 public class HealthRegen extends Stat {
+	private static final double STEP_VAL = 20., DEFAULT_VAL = 200. + STEP_VAL;
+	private static final String TICK = "tick";
+	private int tick;
+
 	public HealthRegen() {
 		super(GmMod.MOD_ID + ".HealthRegen");
+		this.tick = (int) (DEFAULT_VAL - STEP_VAL * this.getValue());
+		this.setMin(0.);
+		this.setMax(10.);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@Override
-	public void onChange(double oldValue, double newValue) {
-		if (newValue < 0 || newValue > 10) {
-			// TODO throw error
+	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException {
+		super.onChange(oldValue, newValue);
+		if (newValue == 0) {
+			tick = (int) DEFAULT_VAL;
+		} else if (oldValue == 0) {
+			tick = (int) (DEFAULT_VAL - STEP_VAL * this.getValue());
+		} else {
+			tick = Math.max(1, (int) (tick + STEP_VAL * (oldValue - newValue)));
+		}
+	}
+
+	@SubscribeEvent
+	public void regenTickEvent(SheetTickEvent event) {
+		if (this.getValue() <= 0)
+			return;
+		if (!event.sheet.equals(this.getSheet()))
+			return;
+		if (tick <= 0) {
+			event.owner.heal(1f);
+			tick = (int) (DEFAULT_VAL - STEP_VAL * this.getValue());
 			return;
 		}
-		if (newValue == 0) {
-			HealthRegenListener.removePlayer((Player) this.getOwner());
-		} else if (oldValue == 0) {
-			HealthRegenListener.registerPlayer((Player) this.getOwner(), newValue);
-		} else {
-			HealthRegenListener.updatePlayer((Player) this.getOwner(), newValue - oldValue);
-		}
+		tick -= 1;
 	}
 
-	@Mod.EventBusSubscriber(modid = GmMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-	public static class HealthRegenListener {
-		private static final Map<Player, Integer> playerMap = new HashMap<Player, Integer>();
-		private static final double MAX_VAL = 200., STEP_VAL = 20.;
-
-		@SubscribeEvent
-		public static void regenTickCommands(PlayerTickEvent event) {
-			if (playerMap.containsKey(event.player)) {
-				CharacterSheet sheet = event.player.getCapability(CharacterSheet.SHEET_CAPABILITY).orElse(null);
-				if (sheet == null) {
-					// TODO throw error;
-					playerMap.remove(event.player);
-					return;
-				}
-				int val = playerMap.get(event.player) - 1;
-				if (val <= 0) {
-					event.player.heal(1f);
-					val = (int) (MAX_VAL - STEP_VAL * sheet.getStat(HealthRegen.class).getValue());
-				}
-				playerMap.put(event.player, val);
-			}
-		}
-
-		static void removePlayer(Player p) {
-			playerMap.remove(p);
-		}
-
-		static void registerPlayer(Player p, double level) {
-			playerMap.put(p, (int) (MAX_VAL - STEP_VAL * level));
-		}
-
-		static void updatePlayer(Player p, double diff) {
-			playerMap.put(p, playerMap.get(p) - (int) (STEP_VAL * diff));
-		}
-
+	@Override
+	protected CompoundTag toNBT() {
+		CompoundTag retour = super.toNBT();
+		retour.putInt(TICK, tick);
+		return retour;
 	}
 
+	@Override
+	public void fromNBT(CompoundTag nbt) {
+		super.fromNBT(nbt);
+		this.tick = nbt.getInt(TICK);
+	}
 }

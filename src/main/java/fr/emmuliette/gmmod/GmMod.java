@@ -35,6 +35,7 @@ public class GmMod {
 //        // Register the processIMC method for modloading
 //        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
+
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -52,6 +53,7 @@ public class GmMod {
 			e.printStackTrace();
 		}
 	}
+
 
 //    private void enqueueIMC(final InterModEnqueueEvent event)
 //    {
@@ -71,7 +73,11 @@ public class GmMod {
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
 		// Do something when the server starts
-		LOGGER.info("HELLO from server starting");
+		logger().info("HELLO from server starting");
+	}
+
+	public static Logger logger() {
+		return LOGGER;
 	}
 
 	// You can use EventBusSubscriber to automatically subscribe events on the
@@ -82,7 +88,7 @@ public class GmMod {
 		@SubscribeEvent
 		public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
 			// Register a new block here
-			LOGGER.info("HELLO from Register Block");
+			logger().info("HELLO from Register Block");
 		}
 	}
 }

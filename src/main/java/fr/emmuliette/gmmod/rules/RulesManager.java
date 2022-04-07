@@ -3,6 +3,7 @@ package fr.emmuliette.gmmod.rules;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.emmuliette.gmmod.GmMod;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -45,9 +46,11 @@ public class RulesManager extends SavedData {
 			this.setValue(value);
 			this.id = id;
 		}
+
 		public String getValue() {
 			return value;
 		}
+
 		public void setValue(String value) {
 			this.value = value;
 		}
@@ -103,37 +106,38 @@ public class RulesManager extends SavedData {
 	private void init(ServerLevel level) {
 		level.getDataStorage().computeIfAbsent(this::load, this::create, "gmmodrules");
 	}
-	
+
 	private RulesManager create() {
 		setDirty();
 		return this;
 	}
 
 	private RulesManager load(CompoundTag tag) {
-		System.out.println("LOADING... " + tag);
+		GmMod.logger().info("Loading config");
 		this.LEVELINGMODE.setValue(tag.getInt(RULES.LEVELINGMODE.getName().toLowerCase()));
 		this.MULTICLASS.setValue(tag.getBoolean(RULES.MULTICLASS.getName().toLowerCase()));
-		System.out.println("LOADED ! " + tag);
+		GmMod.logger().info("Config loaded");
 		return this;
 	}
 
 	@Override
 	public CompoundTag save(CompoundTag tag) {
+		GmMod.logger().info("Saving config");
 		tag.putInt(this.LEVELINGMODE.getName().toLowerCase(), this.LEVELINGMODE.getValue().id);
 		tag.putBoolean(this.MULTICLASS.getName().toLowerCase(), this.MULTICLASS.getValue());
-		System.out.println("SAVE ! " + tag);
+		GmMod.logger().info("Config saved");
 		return tag;
 	}
-	
-    @SubscribeEvent
-    public static void loadWorld(WorldEvent.Load event) {
-    	if(event.getWorld().getServer() == null) {
-    		return;
-    	}
-    	if(event.getWorld().equals(event.getWorld().getServer().overworld())) {
-    		RULES = new RulesManager();
-    		RULES.init(event.getWorld().getServer().overworld());
-    	}
-    }
-	
+
+	@SubscribeEvent
+	public static void loadWorld(WorldEvent.Load event) {
+		if (event.getWorld().getServer() == null) {
+			return;
+		}
+		if (event.getWorld().equals(event.getWorld().getServer().overworld())) {
+			RULES = new RulesManager();
+			RULES.init(event.getWorld().getServer().overworld());
+		}
+	}
+
 }

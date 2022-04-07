@@ -18,6 +18,8 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.KnockbackResistance;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
+import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
+import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import fr.emmuliette.gmmod.jobs.Job;
 import fr.emmuliette.gmmod.packets.PacketHandler;
 import fr.emmuliette.gmmod.packets.SheetPacket;
@@ -26,7 +28,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -34,22 +38,31 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 
 public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
-	private Entity owner;
+	private LivingEntity owner;
 	private Map<Job, Integer> jobs;
 	private Map<Class<? extends Stat>, Stat> stats;
 
-	public CharacterSheet(Entity owner) {
+	public CharacterSheet() {
+		this(null);
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	public CharacterSheet(LivingEntity owner) {
 		this.owner = owner;
 		jobs = new HashMap<Job, Integer>();
 		initStatsInternal();
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	protected void initStats() {
@@ -73,19 +86,17 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
+		} catch (DuplicateStatException e) {
+			e.printStackTrace();
 		}
 		initStats();
 	}
 
-	public CharacterSheet() {
-		this(null);
-	}
-
-	public Entity getOwner() {
+	public LivingEntity getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Entity owner) {
+	public void setOwner(LivingEntity owner) {
 		this.owner = owner;
 	}
 
@@ -101,22 +112,20 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		return stats.values();
 	}
 
-	public Stat getStat(Class<? extends Stat> stat) {
+	public Stat getStat(Class<? extends Stat> stat) throws MissingStatException {
 		if (!stats.containsKey(stat)) {
-			// TODO throw error
-			return null;
+			throw new MissingStatException(this, stat);
 		}
 		return stats.get(stat);
 	}
 
-	protected final void addStat(Class<? extends Stat> statClass) throws InstantiationException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	protected final void addStat(Class<? extends Stat> statClass)
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException, DuplicateStatException {
 		if (stats.containsKey(statClass)) {
-			// TODO throw error
-			return;
+			throw new DuplicateStatException(this, statClass);
 		}
-		Stat stat;
-		stat = statClass.getConstructor().newInstance();
+		Stat stat = statClass.getConstructor().newInstance();
 		stats.put(statClass, stat);
 		stat.setSheet(this);
 	}
@@ -154,8 +163,9 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	public CompoundTag serializeNBT() {
 		CompoundTag retour = new CompoundTag();
 		CompoundTag statsTag = new CompoundTag();
+
 		for (Stat stat : stats.values()) {
-			stat.mergeNBT(statsTag);
+			stat.toNBT(statsTag);
 		}
 		retour.put("stats", statsTag);
 		return retour;
@@ -165,7 +175,21 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	public void deserializeNBT(CompoundTag nbt) {
 		CompoundTag statsTag = nbt.getCompound("stats");
 		for (String key : statsTag.getAllKeys()) {
-			setStat(Stat.getStat(key), statsTag.getFloat(key));
+			try {
+				Class<? extends Stat> statClass = Stat.getStat(key);
+				if (!this.stats.containsKey(statClass)) {
+					GmMod.logger().warn("ADDING MISSING STAT " + key);
+					this.addStat(statClass);
+				}
+				getStat(statClass).fromNBT(statsTag.getCompound(key));
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MissingStatException | DuplicateStatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -180,6 +204,14 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		return cap == SHEET_CAPABILITY ? this.capabilityInstance.cast() : LazyOptional.empty();
 	}
 
+	// EVENT
+
+	@SubscribeEvent
+	public void serverTickEvent(ServerTickEvent event) {
+		if (event.side == LogicalSide.SERVER && event.phase == TickEvent.Phase.END && this.owner != null)
+			MinecraftForge.EVENT_BUS.post(new SheetTickEvent(event, this));
+	}
+
 	@Mod.EventBusSubscriber(modid = GmMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class SheetCapabilityEvents {
 		@SubscribeEvent
@@ -192,7 +224,7 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			if (event.getObject() instanceof Player) {
 				Player player = (Player) event.getObject();
 				if (!player.getCapability(SHEET_CAPABILITY).isPresent()) {
-					event.addCapability(KEY, new CharacterSheet(event.getObject()));
+					event.addCapability(KEY, new CharacterSheet(player));
 				}
 			}
 		}

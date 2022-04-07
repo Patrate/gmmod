@@ -5,6 +5,7 @@ import java.util.Set;
 
 import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
+import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -16,7 +17,6 @@ public abstract class AttributeStat extends Stat {
 	private Attribute attribute;
 	private Operation operation;
 	private String name;
-	private double min, max;
 
 	public AttributeStat(Attribute attribute, Operation operation) {
 		super("");
@@ -26,20 +26,14 @@ public abstract class AttributeStat extends Stat {
 		this.operation = operation;
 		if (attribute instanceof RangedAttribute) {
 			RangedAttribute rAttr = (RangedAttribute) attribute;
-			this.min = rAttr.getMinValue();
-			this.max = rAttr.getMaxValue();
+			this.setMin(rAttr.getMinValue());
+			this.setMax(rAttr.getMaxValue());
 		}
 	}
 
 	@Override
-	public void onChange(double oldValue, double newValue) {
-		double value = newValue;
-		if (newValue > max)
-			// TODO throw error
-			value = max;
-		if (newValue < min)
-			// TODO throw error
-			value = min;
+	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException {
+		super.onChange(oldValue, newValue);
 		Entity owner = getOwner();
 		if (owner != null && owner instanceof LivingEntity) {
 			LivingEntity lEntity = (LivingEntity) owner;
@@ -49,7 +43,7 @@ public abstract class AttributeStat extends Stat {
 					olds.add(am);
 				}
 			}
-			lEntity.getAttribute(attribute).addPermanentModifier(new AttributeModifier(name, value, operation));
+			lEntity.getAttribute(attribute).addPermanentModifier(new AttributeModifier(name, newValue, operation));
 			for (AttributeModifier am : olds) {
 				lEntity.getAttribute(attribute).removeModifier(am);
 			}

@@ -23,7 +23,6 @@ public class StatArgument implements ArgumentType<String> {
 	}
 
 	private static String verifyStat(String key) throws CommandSyntaxException {
-		System.out.println("CHECKING HERE: " + key + " return " + Stat.getStat(key));
 		if (Stat.getStat(key) != null)
 			return key;
 		throw ERROR_UNKNOWN_STAT.create(key);

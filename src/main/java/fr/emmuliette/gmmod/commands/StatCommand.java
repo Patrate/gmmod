@@ -8,8 +8,10 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
+import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -60,32 +62,34 @@ public class StatCommand {
 	private static int setStat(CommandSourceStack context, Collection<? extends ServerPlayer> targets,
 			Class<? extends Stat> stat, double amount) throws CommandSyntaxException {
 		int i = 0;
-		System.out.println("Setting stat " + stat + " to " + amount);
+		GmMod.logger().info("Setting stat " + stat + " to " + amount);
 
 		for (ServerPlayer serverplayer : targets) {
 			CharacterSheet sheet = serverplayer.getCapability(CharacterSheet.SHEET_CAPABILITY).orElse(null);
 			if (sheet == null) {
-				System.out.println("No sheet found for target");
+				GmMod.logger().warn("No sheet found for target " + serverplayer);
 				continue;
 			}
-			System.out.println("Sheet found !");
-			sheet.getStat(stat).setValue(amount);
-			++i;
+			try {
+				sheet.getStat(stat).setValue(amount);
+				++i;
+			} catch (MissingStatException e) {
+				// TODO send error to caller
+				e.printStackTrace();
+			}
 		}
 
 		if (i == 0) {
-			System.out.println("i == 0");
+			GmMod.logger().warn("i == 0");
 			throw ERROR_SET_POINTS_INVALID.create();
 		} else {
 			if (targets.size() == 1) {
-				System.out.println("SUCCESS ONE");
 				context.sendSuccess(new TextComponent("Set " + stat + " to " + amount),
 						// new TranslatableComponent("commands.experience.set." + "POINTS " +
 						// ".success.single", amount,
 						// targets.iterator().next().getDisplayName()),
 						true);
 			} else {
-				System.out.println("SUCCESS MULTIPLE");
 				context.sendSuccess(new TextComponent("Set " + stat + " to " + amount),
 						// new TranslatableComponent("commands.experience.set." + " POINTS " +
 						// ".success.multiple", amount, targets.size()),
@@ -112,7 +116,12 @@ public class StatCommand {
 				result.append(s.getClass().getSimpleName() + " " + s.getValue() + "\n");
 			}
 		} else {
-			result.append(stat.getSimpleName() + " " + sheet.getStat(stat).getValue());
+			try {
+				result.append(stat.getSimpleName() + " " + sheet.getStat(stat).getValue());
+			} catch (MissingStatException e) {
+				// TODO send error to caller
+				e.printStackTrace();
+			}
 		}
 		context.sendSuccess(new TextComponent(result.toString()), false);
 		return Command.SINGLE_SUCCESS;
