@@ -19,9 +19,11 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.StrongStomach;
+import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.LivingEntity;
 
 public abstract class Stat {
 	private static final String VALUE = "value";
@@ -32,11 +34,11 @@ public abstract class Stat {
 	private double min, max;
 
 	protected final void setKey(String key) {
-		this.key = key;
+		this.key = key.toLowerCase();
 	}
 
 	public Stat(String key) {
-		this.key = key;
+		this.key = key.toLowerCase();
 		this.value = 0;
 		this.min = Double.MIN_VALUE;
 		this.max = Double.MAX_VALUE;
@@ -70,7 +72,7 @@ public abstract class Stat {
 	}
 
 	public static Class<? extends Stat> getStat(String key) {
-		return registry.get(key);
+		return registry.get(key.toLowerCase());
 	}
 
 	public final CharacterSheet getSheet() {
@@ -81,12 +83,20 @@ public abstract class Stat {
 		this.sheet = sheet;
 	}
 
-	public Entity getOwner() {
+	public LivingEntity getOwner() {
 		return this.sheet == null ? null : this.sheet.getOwner();
 	}
 
 	public String getKey() {
 		return key;
+	}
+
+	public TranslatableComponent getName() {
+		return new TranslatableComponent(key);
+	}
+
+	public TranslatableComponent getTooltip() {
+		return new TranslatableComponent(key + ".tooltip");
 	}
 
 	public double getValue() {
@@ -102,6 +112,8 @@ public abstract class Stat {
 			onChange(old, this.value);
 		} catch (StatOutOfBoundsException e) {
 			e.printStackTrace();
+		} catch (MissingSheetDataException e) {
+			GmMod.logger().warn(e.getMessage());
 		}
 	}
 
@@ -121,21 +133,21 @@ public abstract class Stat {
 		this.max = max;
 	}
 
-	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException {
+	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException, MissingSheetDataException {
 		if (newValue > this.getMax()) {
-			// TODO throw error
 			this.setValue(this.getMax());
 			throw new StatOutOfBoundsException(
 					"New value " + newValue + " is over " + this.getMax() + " for stat " + this.getKey());
 		}
 		if (newValue < this.getMin()) {
-			// TODO throw error
 			this.setValue(this.getMin());
 			throw new StatOutOfBoundsException(
 					"New value " + newValue + " is under " + this.getMin() + " for stat " + this.getKey());
 		}
 
 	}
+
+	public abstract void init() throws StatOutOfBoundsException, MissingSheetDataException;
 
 	public final void toNBT(CompoundTag in) {
 		in.put(key, toNBT());

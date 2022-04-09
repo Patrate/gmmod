@@ -30,4 +30,8 @@ public class StrongStomach extends Stat {
 					(float) (foodproperties.getSaturationModifier() * ((MAX_BOOST - 1) * this.getValue()) / 10));
 		}
 	}
+
+	@Override
+	public void init() {
+	}
 }

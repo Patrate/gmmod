@@ -27,7 +27,7 @@ public class StatArgument implements ArgumentType<String> {
 	}
 
 	private static String verifyStat(String key) throws CommandSyntaxException {
-		if (Stat.getStat(key) != null)
+		if (getStatList().contains(key))
 			return key;
 		throw ERROR_UNKNOWN_STAT.create(key);
 	}
@@ -45,11 +45,12 @@ public class StatArgument implements ArgumentType<String> {
 	static Collection<String> getStatList() {
 		return Stat.getRegistry();
 	}
-	
+
 	@SuppressWarnings("hiding")
 	@Override
-	public <CommandSourceStack> CompletableFuture<Suggestions> listSuggestions(CommandContext<CommandSourceStack> command, SuggestionsBuilder builder) {
-	      return SharedSuggestionProvider.suggest(getStatList(), builder);
+	public <CommandSourceStack> CompletableFuture<Suggestions> listSuggestions(
+			CommandContext<CommandSourceStack> command, SuggestionsBuilder builder) {
+		return SharedSuggestionProvider.suggest(getStatList(), builder);
 	}
 
 }

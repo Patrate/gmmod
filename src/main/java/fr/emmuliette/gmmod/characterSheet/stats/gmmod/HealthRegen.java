@@ -4,6 +4,7 @@ import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.SheetTickEvent;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.configuration.Configuration;
+import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.MinecraftForge;
@@ -25,7 +26,7 @@ public class HealthRegen extends Stat {
 	}
 
 	@Override
-	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException {
+	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException, MissingSheetDataException {
 		super.onChange(oldValue, newValue);
 		if (newValue == 0) {
 			tick = (int) DEFAULT_VAL;
@@ -34,6 +35,11 @@ public class HealthRegen extends Stat {
 		} else {
 			tick = Math.max(1, (int) (tick + STEP_VAL * (oldValue - newValue)));
 		}
+	}
+	
+	@Override
+	public void init() throws StatOutOfBoundsException, MissingSheetDataException {
+		onChange(0, this.getValue());
 	}
 
 	@SubscribeEvent

@@ -35,7 +35,6 @@ public class GmMod {
 //        // Register the processIMC method for modloading
 //        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
-
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -53,7 +52,6 @@ public class GmMod {
 			e.printStackTrace();
 		}
 	}
-
 
 //    private void enqueueIMC(final InterModEnqueueEvent event)
 //    {

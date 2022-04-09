@@ -20,7 +20,9 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.StrongStomach;
 import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
+import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.MissingStatException;
+import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import fr.emmuliette.gmmod.jobs.Job;
 import fr.emmuliette.gmmod.packets.PacketHandler;
 import fr.emmuliette.gmmod.packets.SheetPacket;
@@ -270,6 +272,17 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			ServerPlayer player = (ServerPlayer) event.getPlayer();
 			if (!player.level.isClientSide) {
 				player.getCapability(CharacterSheet.SHEET_CAPABILITY).ifPresent(c -> c.sync(player));
+				player.getCapability(CharacterSheet.SHEET_CAPABILITY).ifPresent(c -> c.postInit());
+			}
+		}
+	}
+
+	public void postInit() {
+		for (Stat stat : stats.values()) {
+			try {
+				stat.init();
+			} catch (StatOutOfBoundsException | MissingSheetDataException e) {
+				GmMod.logger().warn("Error during Stat " + stat.getKey() + " init: " + e.getMessage());
 			}
 		}
 	}
