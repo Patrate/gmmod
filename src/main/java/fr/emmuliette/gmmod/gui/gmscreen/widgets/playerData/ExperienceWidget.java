@@ -5,23 +5,18 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 
-public class ExperienceWidget extends ScrollableWidget {
+public class ExperienceWidget extends InternalSWidget {
 	public static final int WIDTH = 88;
 	private PlayerDataPanel parent;
 
-	public ExperienceWidget(PlayerDataPanel parent, int x, int y) {
-		super(parent.getParent(), x, y, WIDTH, 16, new TextComponent("Experience"));
+	public ExperienceWidget(PlayerDataPanel parent) {
+		super(parent.getParent(), WIDTH, 16, new TextComponent("Experience"));
 		this.parent = parent;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
 	}
 
 	@Override
@@ -36,7 +31,7 @@ public class ExperienceWidget extends ScrollableWidget {
 	}
 
 	public void renderToolTip(PoseStack stack, int mouseX, int mouseY, Player player) {
-		drawString(stack, parent.getParent().getParent().getFontRenderer(),
+		drawString(stack, parent.getParent().getFont(),
 				new TextComponent("" + (int) player.experienceProgress + "/" + player.getXpNeededForNextLevel()),
 				mouseX, mouseY, 16777215);
 	}
@@ -55,13 +50,13 @@ public class ExperienceWidget extends ScrollableWidget {
 			}
 
 			String s = "" + player.experienceLevel;
-			int xPos = x + (this.width - this.getParent().getParent().getFontRenderer().width(s)) / 2;
+			int xPos = x + (this.width - this.getParent().getFont().width(s)) / 2;
 			int yPos = y - 3;
-			this.getParent().getParent().getFontRenderer().draw(poseStack, s, (float) (xPos + 1), (float) yPos, 0);
-			this.getParent().getParent().getFontRenderer().draw(poseStack, s, (float) (xPos - 1), (float) yPos, 0);
-			this.getParent().getParent().getFontRenderer().draw(poseStack, s, (float) xPos, (float) (yPos + 1), 0);
-			this.getParent().getParent().getFontRenderer().draw(poseStack, s, (float) xPos, (float) (yPos - 1), 0);
-			this.getParent().getParent().getFontRenderer().draw(poseStack, s, (float) xPos, (float) yPos, 8453920);
+			this.getParent().getFont().draw(poseStack, s, (float) (xPos + 1), (float) yPos, 0);
+			this.getParent().getFont().draw(poseStack, s, (float) (xPos - 1), (float) yPos, 0);
+			this.getParent().getFont().draw(poseStack, s, (float) xPos, (float) (yPos + 1), 0);
+			this.getParent().getFont().draw(poseStack, s, (float) xPos, (float) (yPos - 1), 0);
+			this.getParent().getFont().draw(poseStack, s, (float) xPos, (float) yPos, 8453920);
 		}
 		RenderSystem.enableBlend();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

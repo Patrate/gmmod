@@ -26,7 +26,10 @@ public class GmScreen extends Screen {
 
 	}
 
-//	private Screen oldScreen;
+	@Override
+	public boolean isPauseScreen() {
+		return false;
+	}
 
 	public boolean isOpen() {
 		return this.equals(this.minecraft.screen);
@@ -34,21 +37,20 @@ public class GmScreen extends Screen {
 
 	public void open() {
 		GmMod.logger().debug("OPENING GM SCREEN");
-//		oldScreen = this.minecraft.screen;
 		this.minecraft.setScreen(this);
 	}
 
 	public void close() {
 		GmMod.logger().debug("CLOSING GM SCREEN");
-		this.minecraft.setScreen(null);//oldScreen);
+		this.minecraft.setScreen(null);
 	}
 
 	@Override
 	protected void init() {
 		this.playerList = new PlayerListWidget(this, 80, 20);
 		this.addRenderableWidget(playerList);
-		this.sheetPanel = new SheetPanel(minecraft, this, width - playerList.getWidth(), height, 0,
-				playerList.getWidth());
+		this.sheetPanel = new SheetPanel(minecraft, this, (width - playerList.getRight()), height, 0,
+				playerList.getRight());
 		this.addRenderableWidget(sheetPanel);
 	}
 
@@ -61,7 +63,6 @@ public class GmScreen extends Screen {
 			return;
 
 		sheetPanel.setInfo(sheet);
-//		sheetPanel.setFocused(this);
 	}
 
 	public Font getFontRenderer() {

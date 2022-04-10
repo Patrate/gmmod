@@ -10,30 +10,28 @@ import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.StatWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class StatPanel extends ScrollableWidget {
-	private final List<StatWidget> statWidgets;
+@OnlyIn(Dist.CLIENT)
+public class StatPanel extends ContainerPanel {
+	private final List<ScrollableWidget> childrens;
 
-	public StatPanel(SheetPanel panel, int x, int y) {
-		super(panel, x, y, panel.WIDTH, 0);
-		statWidgets = new ArrayList<StatWidget>();
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
+	public StatPanel(SheetPanel panel, int ratio) {
+		super(panel, ratio);
+		childrens = new ArrayList<ScrollableWidget>();
 	}
 
 	public void clearContent() {
-		statWidgets.clear();
+		childrens.clear();
 	}
 
 	public void updateContent(CharacterSheet sheet) {
-		statWidgets.clear();
+		childrens.clear();
 		int i = 0;
 		for (Stat stat : sheet.getStats()) {
 			getParent();
-			statWidgets.add(new StatWidget(this, centerX(StatWidget.WIDTH), SheetPanel.BORDER + this.y + i * 20, stat));
+			childrens.add(new StatWidget(this, centerX(StatWidget.WIDTH), SheetPanel.BORDER + this.y + i * 20, stat));
 			i++;
 		}
 		getParent();
@@ -45,34 +43,40 @@ public class StatPanel extends ScrollableWidget {
 		int diff = super.setScrollY(newY);
 		if (diff == 0)
 			return 0;
-		for (StatWidget w : statWidgets) {
+		for (ScrollableWidget w : childrens) {
 			w.y += diff;
 		}
 		return diff;
 	}
 
-	private void drawBackground(int baseY, Tesselator tess) {
-		drawBorder(tess, this.x, this.y + baseY, getParent().WIDTH, this.height, SheetPanel.PADDING, SheetPanel.BORDER);
-	}
-
 	@Override
 	protected void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick, int entryRight, int baseY,
 			Tesselator tess) {
-		if (this.visible && !statWidgets.isEmpty()) {
-			drawBackground(baseY, tess);
-			// TODO borders
-			for (StatWidget w : statWidgets) {
-				w.render(poseStack, mouseX, mouseY, partialTick, entryRight, baseY, tess);
+		super.render(poseStack, mouseX, mouseY, partialTick, entryRight, baseY, tess);
+		if (this.visible) {
+			for (ScrollableWidget w : childrens) {
+				w.render(poseStack, mouseX, mouseY, partialTick);
 			}
 		}
+	}
+	
+	protected void updateVisible() {
+		this.visible = !childrens.isEmpty();
 	}
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		for (StatWidget w : statWidgets) {
+		for (ScrollableWidget w : childrens) {
 			if (w.mouseClicked(mouseX, mouseY, button))
 				return true;
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	@Override
+	public void init() {
+		for (ScrollableWidget w : childrens) {
+			centerX(w);
+		}
 	}
 }

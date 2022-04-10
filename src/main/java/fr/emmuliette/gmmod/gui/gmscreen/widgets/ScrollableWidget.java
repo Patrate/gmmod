@@ -7,26 +7,31 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
+import fr.emmuliette.gmmod.gui.gmscreen.panels.CustomScrollPanel.ScrollData;
 import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel.ScrollData;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 public abstract class ScrollableWidget extends AbstractWidget {
 	private SheetPanel parent;
-	private final static TextComponent TXT = new TextComponent("");
-
-	public ScrollableWidget(SheetPanel panel, int x, int y, int width, int height) {
-		this(panel, x, y, width, height, TXT);
-	}
+	private int ratio;
 
 	public ScrollableWidget(SheetPanel panel, int x, int y, int width, int height, Component message) {
+		this(panel, x, y, width, height, width, message);
+	}
+
+	public ScrollableWidget(SheetPanel panel, int x, int y, int width, int height, int ratio, Component message) {
 		super(x, y, width, height, message);
 		parent = panel;
+		this.ratio = ratio;
+		if(ratio <= 0)
+			// TODO throw error
+			return;
 	}
+
+	public abstract void init();
 
 	protected abstract void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick, int entryRight,
 			int baseY, Tesselator tess);
@@ -39,8 +44,12 @@ public abstract class ScrollableWidget extends AbstractWidget {
 		render(poseStack, mouseX, mouseY, partialTick, data.right, data.baseY, data.tess);
 	}
 
+	protected void centerX(ScrollableWidget widget) {
+		widget.x = centerX(widget.width);
+	}
+
 	protected int centerX(int widgetWidth) {
-		return this.x + (parent.WIDTH / 2 - widgetWidth / 2);
+		return this.x + (this.width / 2 - widgetWidth / 2);
 	}
 
 	public SheetPanel getParent() {
@@ -87,5 +96,9 @@ public abstract class ScrollableWidget extends AbstractWidget {
 		worldr.vertex(x - padding, y - padding, 0.0D).uv((x - padding) / texScale, (y - padding) / texScale)
 				.color(r, g, b, alpha).endVertex();
 		tess.end();
+	}
+
+	public int getRatio() {
+		return ratio;
 	}
 }

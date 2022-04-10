@@ -5,8 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
@@ -17,17 +16,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class HealthWidget extends ScrollableWidget {
+public class HealthWidget extends InternalSWidget {
 	public static final int WIDTH = 84;
 	private PlayerDataPanel parent;
 
-	public HealthWidget(PlayerDataPanel parent, int x, int y) {
-		super(parent.getParent(), x, y, WIDTH, 9, new TextComponent("Health"));
+	public HealthWidget(PlayerDataPanel parent) {
+		super(parent.getParent(), WIDTH, 9, new TextComponent("Health"));
 		this.parent = parent;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
 	}
 
 	@Override
@@ -67,7 +62,7 @@ public class HealthWidget extends ScrollableWidget {
 									: HealthWidget.HeartType.ABSORBING)
 							: gui$hearttype,
 					left, top, i, false, false);
-			drawString(stack, this.getParent().getParent().getFontRenderer(), "x" + current, left + 10, top, 0xFFFFFF);
+			drawString(stack, this.getParent().getFont(), "x" + current, left + 10, top, 0xFFFFFF);
 			return;
 		}
 

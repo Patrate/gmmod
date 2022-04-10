@@ -7,13 +7,12 @@ import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.gui.gmscreen.panels.StatPanel;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class StatWidget extends ScrollableWidget {
+public class StatWidget extends InternalSWidget {
 	public static final int WIDTH = 238;
 	private Stat stat;
 	private Button minus, plus;
@@ -40,10 +39,6 @@ public class StatWidget extends ScrollableWidget {
 	}
 
 	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
-	}
-
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		double newY = mouseY + parent.getParent().getScrollData().baseY;
 		if (minus.mouseClicked(mouseX, newY, button) || plus.mouseClicked(mouseX, newY, button))
@@ -55,10 +50,9 @@ public class StatWidget extends ScrollableWidget {
 	public void render(PoseStack stack, int mouseX, int mouseY, float partialTick, int entryRight, int baseY,
 			Tesselator tess) {
 		if (this.visible) {
-			drawString(stack, parent.getParent().getParent().getFontRenderer(), stat.getName(), this.x, this.y + baseY,
+			drawString(stack, parent.getParent().getFont(), stat.getName(), this.x, this.y + baseY, 16777215);
+			drawString(stack, parent.getParent().getFont(), "" + stat.getValue(), this.x + 150, this.y + baseY,
 					16777215);
-			drawString(stack, parent.getParent().getParent().getFontRenderer(), "" + stat.getValue(), this.x + 150,
-					this.y + baseY, 16777215);
 
 			this.minus.y = this.y + baseY;
 			this.plus.y = this.y + baseY;
@@ -75,8 +69,7 @@ public class StatWidget extends ScrollableWidget {
 	@Override
 	public void renderToolTip(PoseStack stack, int mouseX, int mouseY) {
 //		super.renderToolTip(stack, mouseX, mouseY);
-		drawString(stack, parent.getParent().getParent().getFontRenderer(), stat.getTooltip(), mouseX, mouseY,
-				16777215);
+		drawString(stack, parent.getParent().getFont(), stat.getTooltip(), mouseX, mouseY, 16777215);
 	}
 
 	@Override

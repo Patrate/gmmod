@@ -5,24 +5,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
-public class AirWidget extends ScrollableWidget {
+public class AirWidget extends InternalSWidget {
 	public static final int WIDTH = 84;
 	private PlayerDataPanel parent;
 
-	public AirWidget(PlayerDataPanel parent, int x, int y) {
-		super(parent.getParent(), x, y, WIDTH, 9, new TextComponent("Air"));
+	public AirWidget(PlayerDataPanel parent) {
+		super(parent.getParent(), WIDTH, 9, new TextComponent("Air"));
 		this.parent = parent;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
 	}
 
 	@Override

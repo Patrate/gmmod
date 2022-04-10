@@ -5,25 +5,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 
-public class FoodWidget extends ScrollableWidget {
+public class FoodWidget extends InternalSWidget {
 	public static final int WIDTH = 84;
 	private PlayerDataPanel parent;
 
-	public FoodWidget(PlayerDataPanel parent, int x, int y) {
-		super(parent.getParent(), x, y, WIDTH, 9, new TextComponent("Food"));
+	public FoodWidget(PlayerDataPanel parent) {
+		super(parent.getParent(), WIDTH, 9, new TextComponent("Food"));
 		this.parent = parent;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
 	}
 
 	@Override
@@ -31,6 +26,13 @@ public class FoodWidget extends ScrollableWidget {
 			Tesselator tess) {
 		parent.setupOverlayRenderState(true, false);
 		renderFood(parent.getEntity(), this.x, this.y + baseY, poseStack);
+		if (this.isHovered)
+			renderToolTip(poseStack, mouseX, mouseY, (Player) parent.getEntity());
+	}
+
+	public void renderToolTip(PoseStack stack, int mouseX, int mouseY, Player player) {
+		drawString(stack, parent.getParent().getFont(),
+				new TextComponent("Saturation " + player.getFoodData().getSaturationLevel()), mouseX, mouseY, 16777215);
 	}
 
 	public void renderFood(LivingEntity entity, int left, int top, PoseStack poseStack) {
@@ -66,6 +68,7 @@ public class FoodWidget extends ScrollableWidget {
 
 	@Override
 	protected void checkVisible(int mouseX, int mouseY, int baseY) {
-		visible = (parent.getEntity() != null && (parent.getEntity() instanceof Player) && !((Player) parent.getEntity()).isCreative());
+		visible = (parent.getEntity() != null && (parent.getEntity() instanceof Player)
+				&& !((Player) parent.getEntity()).isCreative());
 	}
 }

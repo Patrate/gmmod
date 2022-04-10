@@ -16,30 +16,37 @@ import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.ArmorWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.ExperienceWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.FoodWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.HealthWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.PosWidget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class PlayerDataPanel extends ScrollableWidget {
+@OnlyIn(Dist.CLIENT)
+public class PlayerDataPanel extends ContainerPanel {
 	private LivingEntity entity;
 	private List<ScrollableWidget> childrens;
 
-	public PlayerDataPanel(SheetPanel panel, int x, int y) {
-		super(panel, x, y, panel.WIDTH, 0);
+	public PlayerDataPanel(SheetPanel panel, int ratio) {
+		super(panel, ratio);
 		childrens = new ArrayList<ScrollableWidget>();
-		childrens.add(new HealthWidget(this, centerX(HealthWidget.WIDTH), this.y + 16));
-		childrens.add(new FoodWidget(this, centerX(FoodWidget.WIDTH), this.y + 25));
-		childrens.add(new ArmorWidget(this, centerX(ArmorWidget.WIDTH), this.y + 34));
-		childrens.add(new AirWidget(this, centerX(AirWidget.WIDTH), this.y + 43));
-		childrens.add(new ExperienceWidget(this, centerX(ExperienceWidget.WIDTH), this.y + 52));
+		childrens.add(new PosWidget(this));
+		childrens.add(new HealthWidget(this));
+		childrens.add(new FoodWidget(this));
+		childrens.add(new ArmorWidget(this));
+		childrens.add(new AirWidget(this));
+		childrens.add(new ExperienceWidget(this));
 	}
 
 	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
+	public void init() {
+		for (ScrollableWidget children : childrens) {
+			centerX(children);
+		}
 	}
 
 	public void clearContent() {
@@ -51,21 +58,16 @@ public class PlayerDataPanel extends ScrollableWidget {
 		this.height = 60;
 	}
 
-	private void drawBackground(int baseY, Tesselator tess) {
-		drawBorder(tess, this.x, this.y + baseY, getParent().WIDTH, this.height , SheetPanel.PADDING,
-				SheetPanel.BORDER);
-	}
-
 	@Override
 	protected void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick, int entryRight, int baseY,
 			Tesselator tess) {
-		if (this.visible && getEntity() != null) {
-			this.drawBackground(baseY, tess);
+		super.render(poseStack, mouseX, mouseY, partialTick, entryRight, baseY, tess);
+		if (this.visible) {
 			Component name = getEntity().getName();
-			Font font = this.getParent().getParent().getFontRenderer();
+			Font font = this.getParent().getFont();
 
-			drawString(poseStack, font, name, centerX(this.getParent().getParent().getFontRenderer().width(name)),
-					this.y + baseY, 0xFFFFFFFF);
+			drawString(poseStack, font, name, centerX(this.getParent().getFont().width(name)), this.y + baseY,
+					0xFFFFFFFF);
 			int i = 0;
 			for (ScrollableWidget w : childrens) {
 				if (w.visible) {
@@ -131,5 +133,10 @@ public class PlayerDataPanel extends ScrollableWidget {
 		}
 		this.height = newHeight;
 		return newHeight;
+	}
+
+	@Override
+	protected void updateVisible() {
+		this.visible = (getEntity() != null);
 	}
 }

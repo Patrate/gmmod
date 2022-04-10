@@ -5,22 +5,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.LivingEntity;
 
-public class ArmorWidget extends ScrollableWidget {
+public class ArmorWidget extends InternalSWidget {
 	public static final int WIDTH = 84;
 	private PlayerDataPanel parent;
 
-	public ArmorWidget(PlayerDataPanel parent, int x, int y) {
-		super(parent.getParent(), x, y, WIDTH, 9, new TextComponent("Armor"));
+	public ArmorWidget(PlayerDataPanel parent) {
+		super(parent.getParent(), WIDTH, 9, new TextComponent("Armor"));
 		this.parent = parent;
-	}
-
-	@Override
-	public void updateNarration(NarrationElementOutput p_169152_) {
 	}
 
 	@Override

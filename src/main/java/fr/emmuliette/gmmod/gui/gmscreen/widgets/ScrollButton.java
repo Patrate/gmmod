@@ -3,8 +3,8 @@ package fr.emmuliette.gmmod.gui.gmscreen.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import fr.emmuliette.gmmod.gui.gmscreen.panels.CustomScrollPanel.ScrollData;
 import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel.ScrollData;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
