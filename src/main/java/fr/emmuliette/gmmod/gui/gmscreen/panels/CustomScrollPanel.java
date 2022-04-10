@@ -62,14 +62,14 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 				return;
 			int step = (this.width - bar_size - 4) / totalRatio - padding - border;
 			int reste = Math.max(0, (this.width - bar_size - 4) - ((step + padding * 2 + border) * totalRatio));
-			int nextX = this.left + padding * 2 + border;
+			int nextX = this.left + padding + border;
 			for (int i = 0; i < rowChildrens.size(); i++) {
 				boolean last = (i == rowChildrens.size() - 1);
 				ScrollableWidget children = rowChildrens.get(i);
 				int size = (children.getRatio() * step) + (last ? reste : 0);
 				children.x = nextX;
 				children.setWidth(size);
-				nextX += size + (padding * 2 + border);
+				nextX += size + padding + border;
 				children.init();
 			}
 		}

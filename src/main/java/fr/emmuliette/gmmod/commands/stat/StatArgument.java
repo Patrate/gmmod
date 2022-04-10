@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.commands;
+package fr.emmuliette.gmmod.commands.stat;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;

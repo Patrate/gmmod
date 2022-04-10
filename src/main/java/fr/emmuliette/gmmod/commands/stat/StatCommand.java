@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.commands;
+package fr.emmuliette.gmmod.commands.stat;
 
 import java.util.Collection;
 
@@ -20,6 +20,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
+/* Registered in ModEventListener */
 public class StatCommand {
 	private static final SimpleCommandExceptionType ERROR_SET_POINTS_INVALID = new SimpleCommandExceptionType(
 			new TranslatableComponent("commands.experience.set.points.invalid"));

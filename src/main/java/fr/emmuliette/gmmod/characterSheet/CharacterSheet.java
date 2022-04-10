@@ -32,7 +32,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -209,7 +208,7 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		return cap == SHEET_CAPABILITY ? this.capabilityInstance.cast() : LazyOptional.empty();
+		return cap == SHEET_CAPABILITY ? (this.capabilityInstance.cast()) : LazyOptional.empty();
 	}
 
 	// EVENT
@@ -228,11 +227,11 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		}
 
 		@SubscribeEvent
-		public static void attachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-			if (event.getObject() instanceof Player) {
-				Player player = (Player) event.getObject();
-				if (!player.getCapability(SHEET_CAPABILITY).isPresent()) {
-					event.addCapability(KEY, new CharacterSheet(player));
+		public static void attachCapabilityLivingEntity(AttachCapabilitiesEvent<Entity> event) {
+			if (event.getObject() instanceof LivingEntity) {
+				LivingEntity entity = (LivingEntity) event.getObject();
+				if (!entity.getCapability(SHEET_CAPABILITY).isPresent()) {
+					event.addCapability(KEY, new CharacterSheet(entity));
 				}
 			}
 		}
