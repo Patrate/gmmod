@@ -3,8 +3,8 @@ package fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
-import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.components.InternalSWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.PlayerDataPanel;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;

@@ -15,8 +15,8 @@ public class StrongStomach extends Stat {
 	public StrongStomach() {
 		super(GmMod.MOD_ID + ".StrongStomach");
 		MAX_BOOST = Configuration.SERVER.strongStomachMax.get();
-		this.setMin(0.);
-		this.setMax(10.);
+		this.setMin(0);
+		this.setMax(10);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
@@ -26,12 +26,18 @@ public class StrongStomach extends Stat {
 				&& event.getItem().isEdible()) {
 			Player player = (Player) this.getOwner();
 			FoodProperties foodproperties = event.getItem().getItem().getFoodProperties();
-			player.getFoodData().eat((int) (foodproperties.getNutrition() * ((MAX_BOOST - 1) * this.getValue()) / 10),
-					(float) (foodproperties.getSaturationModifier() * ((MAX_BOOST - 1) * this.getValue()) / 10));
+			double modifier = ((double) this.getValue()) * 0.1d;
+			player.getFoodData().eat((int) (foodproperties.getNutrition() * ((MAX_BOOST - 1) * modifier) / 10),
+					(float) (foodproperties.getSaturationModifier() * ((MAX_BOOST - 1) * modifier) / 10));
 		}
 	}
 
 	@Override
 	public void init() {
+	}
+
+	@Override
+	public boolean isValid() {
+		return getOwner() instanceof Player;
 	}
 }

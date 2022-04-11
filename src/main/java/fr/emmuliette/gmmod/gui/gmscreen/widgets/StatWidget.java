@@ -3,9 +3,10 @@ package fr.emmuliette.gmmod.gui.gmscreen.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
-import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.StatPanel;
+import fr.emmuliette.gmmod.gui.gmscreen.components.InternalSWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.components.ScrollButton;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.StatPanel;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,12 +31,10 @@ public class StatWidget extends InternalSWidget {
 
 	private void valueUp() {
 		this.stat.setValue(this.stat.getValue() + 1);
-		GmMod.logger().info("+1 " + stat.getName());
 	}
 
 	private void valueDown() {
 		this.stat.setValue(this.stat.getValue() - 1);
-		GmMod.logger().info("-1 " + stat.getName());
 	}
 
 	@Override

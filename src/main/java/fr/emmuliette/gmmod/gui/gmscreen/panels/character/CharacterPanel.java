@@ -1,21 +1,22 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.panels.character;
 
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
 import fr.emmuliette.gmmod.gui.gmscreen.GmScreen;
+import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class SheetPanel extends CustomScrollPanel {
+public class CharacterPanel extends CustomScrollPanel {
 	public final static int PADDING = 2, BORDER = 2, BAR_SIZE = 6;
 
 	private StatPanel stats;
 	private PlayerDataPanel playerData;
 	private AvatarPanel avatar;
 
-	public SheetPanel(Minecraft mcIn, GmScreen parent, int widthIn, int heightIn, int top, int left) {
+	public CharacterPanel(Minecraft mcIn, GmScreen parent, int widthIn, int heightIn, int top, int left) {
 		super(mcIn, parent, widthIn, heightIn, top, left, PADDING, BORDER, BAR_SIZE);
 	}
 
@@ -30,10 +31,12 @@ public class SheetPanel extends CustomScrollPanel {
 	}
 
 	public void setInfo(CharacterSheet sheet) {
+		this.scrollDistance = 0f;
 		this.stats.updateContent(sheet);
 		this.playerData.updateContent(sheet);
 		this.avatar.updateContent(sheet);
 		getContentHeight();
+
 	}
 
 	void clearInfo() {

@@ -1,6 +1,7 @@
 package fr.emmuliette.gmmod.characterSheet;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +14,13 @@ import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackDamage;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackKnockback;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackSpeed;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.FlyingSpeed;
+import fr.emmuliette.gmmod.characterSheet.stats.attributes.FollowRange;
+import fr.emmuliette.gmmod.characterSheet.stats.attributes.JumpStrength;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.KnockbackResistance;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
 import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
+import fr.emmuliette.gmmod.characterSheet.stats.attributes.SpawnReinforcements;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
 import fr.emmuliette.gmmod.characterSheet.stats.gmmod.StrongStomach;
 import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
@@ -83,6 +87,9 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			addStat(Luck.class);
 			addStat(MaxHealth.class);
 			addStat(MovementSpeed.class);
+			addStat(FollowRange.class);
+			addStat(JumpStrength.class);
+			addStat(SpawnReinforcements.class);
 
 			addStat(HealthRegen.class);
 			addStat(StrongStomach.class);
@@ -112,7 +119,12 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	}
 
 	public Collection<Stat> getStats() {
-		return stats.values();
+		Collection<Stat> retour = new ArrayList<Stat>();
+		for (Stat s : stats.values()) {
+			if (s.isValid())
+				retour.add(s);
+		}
+		return retour;
 	}
 
 	public Stat getStat(Class<? extends Stat> stat) throws MissingStatException {
@@ -133,7 +145,7 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		stat.setSheet(this);
 	}
 
-	public void setStat(Class<? extends Stat> statClass, double d) {
+	public void setStat(Class<? extends Stat> statClass, int d) {
 		if (!stats.containsKey(statClass)) {
 			// TODO throw error
 			return;

@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
@@ -29,15 +29,15 @@ public class StatCommand {
 		dispatcher.register(Commands.literal("stats").then(Commands.literal("list").executes((command) -> {
 			return listStats(command.getSource());
 		})).then(Commands.literal("set")
-				.then(Commands.argument("targets", EntityArgument.players()).then(Commands
-						.argument("stat", new StatArgument())
-						.then(Commands.argument("amount", DoubleArgumentType.doubleArg()).suggests((command, text) -> {
-							return SharedSuggestionProvider.suggest(StatArgument.getStatList(), text);
-						}).executes((command) -> {
-							return setStat(command.getSource(), EntityArgument.getPlayers(command, "targets"),
-									StatArgument.getStat(command, "stat"),
-									DoubleArgumentType.getDouble(command, "amount"));
-						})))))
+				.then(Commands.argument("targets", EntityArgument.players())
+						.then(Commands.argument("stat", new StatArgument()).then(
+								Commands.argument("amount", IntegerArgumentType.integer()).suggests((command, text) -> {
+									return SharedSuggestionProvider.suggest(StatArgument.getStatList(), text);
+								}).executes((command) -> {
+									return setStat(command.getSource(), EntityArgument.getPlayers(command, "targets"),
+											StatArgument.getStat(command, "stat"),
+											IntegerArgumentType.getInteger(command, "amount"));
+								})))))
 				.then(Commands.literal("get").executes((command) -> {
 					return getStat(command.getSource());
 				}).then(Commands.argument("target", EntityArgument.player()).executes((command) -> {
@@ -56,7 +56,7 @@ public class StatCommand {
 	}
 
 	private static int setStat(CommandSourceStack context, Collection<? extends ServerPlayer> targets,
-			Class<? extends Stat> stat, double amount) throws CommandSyntaxException {
+			Class<? extends Stat> stat, int amount) throws CommandSyntaxException {
 		int i = 0;
 		GmMod.logger().info("Setting stat " + stat + " to " + amount);
 

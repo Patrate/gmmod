@@ -1,0 +1,22 @@
+{
+	"gmmod.strongstomach": "Stomach",
+	"gmmod.healthregen": "Health regen",
+	"attribute.attackdamage": "Attack damage",
+	"attribute.luck": "Luck",
+	"attribute.movementspeed": "Movement speed",
+	"attribute.flyingspeed": "Flying speed",
+	"attribute.maxhealth": "Max health",
+	"attribute.attackspeed": "Attack speed",
+	"attribute.attackknockback": "Attack Knockback",
+	"attribute.knockbackresistance": "Knockback resistance",
+	"attribute.armor": "Armor",
+	"attribute.armortoughness": "Armor toughness",
+	"attribute.followrange": "Follow range",
+	"attribute.jumpstrength": "Jump strength",
+	"attribute.spawnreinforcements": "Spawn reinforcements",
+	
+	"gui.gmscreen.character": "Character",
+	"gui.gmscreen.jobs": "Jobs",
+	"gui.gmscreen.skills": "Skills",
+	"gui.gmscreen.rules": "Rules"
+}

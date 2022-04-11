@@ -29,9 +29,8 @@ public abstract class Stat {
 	private static final String VALUE = "value";
 	private static final Map<String, Class<? extends Stat>> registry = new HashMap<String, Class<? extends Stat>>();
 	private CharacterSheet sheet;
-	private double value;
 	private String key;
-	private double min, max;
+	private int value, min, max;
 
 	protected final void setKey(String key) {
 		this.key = key.toLowerCase();
@@ -40,8 +39,8 @@ public abstract class Stat {
 	public Stat(String key) {
 		this.key = key.toLowerCase();
 		this.value = 0;
-		this.min = Double.MIN_VALUE;
-		this.max = Double.MAX_VALUE;
+		this.min = Integer.MIN_VALUE;
+		this.max = Integer.MAX_VALUE;
 	}
 
 	public static void registerStat(Class<? extends Stat> stat) throws InstantiationException, IllegalAccessException,
@@ -99,15 +98,15 @@ public abstract class Stat {
 		return new TranslatableComponent(key + ".tooltip");
 	}
 
-	public double getValue() {
+	public int getValue() {
 		return value;
 	}
 
-	public void setValue(double value) {
+	public void setValue(int value) {
 		if (value == this.value)
 			return;
 		try {
-			double old = this.value;
+			int old = this.value;
 			this.value = value;
 			onChange(old, this.value);
 		} catch (StatOutOfBoundsException e) {
@@ -117,23 +116,25 @@ public abstract class Stat {
 		}
 	}
 
-	public double getMin() {
+	public int getMin() {
 		return min;
 	}
 
-	protected void setMin(double min) {
+	protected void setMin(int min) {
 		this.min = min;
 	}
 
-	public double getMax() {
+	public int getMax() {
 		return max;
 	}
 
-	protected void setMax(double max) {
+	protected void setMax(int max) {
 		this.max = max;
 	}
 
-	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException, MissingSheetDataException {
+	public abstract boolean isValid();
+
+	public void onChange(int oldValue, int newValue) throws StatOutOfBoundsException, MissingSheetDataException {
 		if (newValue > this.getMax()) {
 			this.setValue(this.getMax());
 			throw new StatOutOfBoundsException(
@@ -144,7 +145,6 @@ public abstract class Stat {
 			throw new StatOutOfBoundsException(
 					"New value " + newValue + " is under " + this.getMin() + " for stat " + this.getKey());
 		}
-
 	}
 
 	public abstract void init() throws StatOutOfBoundsException, MissingSheetDataException;
@@ -155,11 +155,11 @@ public abstract class Stat {
 
 	protected CompoundTag toNBT() {
 		CompoundTag retour = new CompoundTag();
-		retour.putDouble(VALUE, getValue());
+		retour.putInt(VALUE, getValue());
 		return retour;
 	}
 
 	public void fromNBT(CompoundTag nbt) {
-		this.setValue(nbt.getFloat(VALUE));
+		this.setValue(nbt.getInt(VALUE));
 	}
 }

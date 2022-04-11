@@ -1,17 +1,17 @@
-package fr.emmuliette.gmmod.gui.gmscreen.widgets;
+package fr.emmuliette.gmmod.gui.gmscreen.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
-import fr.emmuliette.gmmod.gui.gmscreen.panels.CustomScrollPanel.ScrollData;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel;
+import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel.ScrollData;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterPanel;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
 public class ScrollButton extends Button {
-	private SheetPanel parent;
+	private CharacterPanel parent;
 
-	public ScrollButton(SheetPanel parent, int x, int y, int width, int height, Component title, OnPress onPress) {
+	public ScrollButton(CharacterPanel parent, int x, int y, int width, int height, Component title, OnPress onPress) {
 		super(x, y, width, height, title, onPress);
 		this.parent = parent;
 	}

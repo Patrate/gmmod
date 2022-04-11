@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.panels.character;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
+import fr.emmuliette.gmmod.gui.gmscreen.components.ContainerPanel;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.StatWidget;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class StatPanel extends ContainerPanel {
 	private final List<ScrollableWidget> childrens;
 
-	public StatPanel(SheetPanel panel, int ratio) {
+	public StatPanel(CharacterPanel panel, int ratio) {
 		super(panel, ratio);
 		childrens = new ArrayList<ScrollableWidget>();
 	}
@@ -31,11 +32,11 @@ public class StatPanel extends ContainerPanel {
 		int i = 0;
 		for (Stat stat : sheet.getStats()) {
 			getParent();
-			childrens.add(new StatWidget(this, centerX(StatWidget.WIDTH), SheetPanel.BORDER + this.y + i * 20, stat));
+			childrens.add(new StatWidget(this, centerX(StatWidget.WIDTH), CharacterPanel.BORDER + this.y + i * 20, stat));
 			i++;
 		}
 		getParent();
-		this.height = i * 20 + SheetPanel.PADDING * 2 + SheetPanel.BORDER * 2;
+		this.height = i * 20 + CharacterPanel.PADDING * 2 + CharacterPanel.BORDER * 2;
 	}
 
 	@Override
@@ -59,7 +60,8 @@ public class StatPanel extends ContainerPanel {
 			}
 		}
 	}
-	
+
+	@Override
 	protected void updateVisible() {
 		this.visible = !childrens.isEmpty();
 	}

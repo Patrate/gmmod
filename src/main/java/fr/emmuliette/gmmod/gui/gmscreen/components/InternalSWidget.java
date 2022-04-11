@@ -1,16 +1,17 @@
-package fr.emmuliette.gmmod.gui.gmscreen.widgets;
+package fr.emmuliette.gmmod.gui.gmscreen.components;
 
-import fr.emmuliette.gmmod.gui.gmscreen.panels.SheetPanel;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterPanel;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
 public abstract class InternalSWidget extends ScrollableWidget {
 
-	public InternalSWidget(SheetPanel panel, int width, int height, Component message) {
+	public InternalSWidget(CharacterPanel panel, int width, int height, Component message) {
 		super(panel, 0, 0, width, height, message);
 	}
 	
-	public InternalSWidget(SheetPanel panel, int x, int y, int width, int height, Component message) {
+	public InternalSWidget(CharacterPanel panel, int x, int y, int width, int height, Component message) {
 		super(panel, x, y, width, height, message);
 	}
 

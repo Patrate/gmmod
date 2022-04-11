@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.components;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,7 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 	private ScrollData scrollData;
 	private float partialTick;
 	private Screen parent;
+	public boolean visible;
 
 	public CustomScrollPanel(Minecraft mc, Screen parent, int width, int height, int top, int left, int padding,
 			int border, int bar_size) {
@@ -61,12 +62,12 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 				// TODO throw error
 				return;
 			int step = (this.width - bar_size - 4) / totalRatio - padding - border;
-			int reste = Math.max(0, (this.width - bar_size - 4) - ((step + padding * 2 + border) * totalRatio));
+			int reste = Math.max(0, (this.width - bar_size - 4) - ((step + padding + border) * totalRatio));
 			int nextX = this.left + padding + border;
 			for (int i = 0; i < rowChildrens.size(); i++) {
 				boolean last = (i == rowChildrens.size() - 1);
 				ScrollableWidget children = rowChildrens.get(i);
-				int size = (children.getRatio() * step) + (last ? reste : 0);
+				int size = (children.getRatio() * step) + (last ? reste + padding + border : 0);
 				children.x = nextX;
 				children.setWidth(size);
 				nextX += size + padding + border;
@@ -124,8 +125,10 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 
 	@Override
 	public void render(PoseStack matrix, int mouseX, int mouseY, float partialTick) {
-		this.partialTick = partialTick;
-		super.render(matrix, mouseX, mouseY, partialTick);
+		if (visible) {
+			this.partialTick = partialTick;
+			super.render(matrix, mouseX, mouseY, partialTick);
+		}
 	}
 
 	@Override
@@ -144,10 +147,12 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 
 	@Override
 	public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-		double newMouseY = (this.scrollData == null) ? mouseY : (mouseY - this.getScrollData().baseY);
-		for (ScrollableWidget w : widgets()) {
-			if (w.mouseClicked(mouseX, newMouseY, button))
-				return true;
+		if (visible) {
+			double newMouseY = (this.scrollData == null) ? mouseY : (mouseY - this.getScrollData().baseY);
+			for (ScrollableWidget w : widgets()) {
+				if (w.mouseClicked(mouseX, newMouseY, button))
+					return true;
+			}
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
@@ -173,4 +178,12 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 	}
 
 	public abstract Font getFont();
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	public boolean visible() {
+		return visible;
+	}
 }

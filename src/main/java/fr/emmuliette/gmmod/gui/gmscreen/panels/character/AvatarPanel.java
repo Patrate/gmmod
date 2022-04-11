@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.panels.character;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -9,6 +9,7 @@ import com.mojang.math.Vector3f;
 
 import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
+import fr.emmuliette.gmmod.gui.gmscreen.components.ContainerPanel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -21,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class AvatarPanel extends ContainerPanel {
 	LivingEntity entity;
 
-	public AvatarPanel(SheetPanel panel, int ratio) {
+	public AvatarPanel(CharacterPanel panel, int ratio) {
 		super(panel, ratio);
 	}
 
@@ -44,6 +45,7 @@ public class AvatarPanel extends ContainerPanel {
 		}
 	}
 
+	@Override
 	protected void updateVisible() {
 		this.visible = (entity != null);
 	}

@@ -11,22 +11,22 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class HealthRegen extends Stat {
-	private static double DEFAULT_VAL, STEP_VAL;
+	private static int DEFAULT_VAL, STEP_VAL;
 	private static final String TICK = "tick";
 	private int tick;
 
 	public HealthRegen() {
 		super(GmMod.MOD_ID + ".HealthRegen");
-		STEP_VAL = Configuration.SERVER.regenLevelStep.get() * 20.;
-		DEFAULT_VAL = Configuration.SERVER.defaultRegenTimer.get() * 20. + STEP_VAL;
+		STEP_VAL = Configuration.SERVER.regenLevelStep.get() * 20;
+		DEFAULT_VAL = Configuration.SERVER.defaultRegenTimer.get() * 20 + STEP_VAL;
 		this.tick = (int) (DEFAULT_VAL - STEP_VAL * this.getValue());
-		this.setMin(0.);
-		this.setMax(10.);
+		this.setMin(0);
+		this.setMax(10);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@Override
-	public void onChange(double oldValue, double newValue) throws StatOutOfBoundsException, MissingSheetDataException {
+	public void onChange(int oldValue, int newValue) throws StatOutOfBoundsException, MissingSheetDataException {
 		super.onChange(oldValue, newValue);
 		if (newValue == 0) {
 			tick = (int) DEFAULT_VAL;
@@ -36,7 +36,7 @@ public class HealthRegen extends Stat {
 			tick = Math.max(1, (int) (tick + STEP_VAL * (oldValue - newValue)));
 		}
 	}
-	
+
 	@Override
 	public void init() throws StatOutOfBoundsException, MissingSheetDataException {
 		onChange(0, this.getValue());
@@ -67,5 +67,10 @@ public class HealthRegen extends Stat {
 	public void fromNBT(CompoundTag nbt) {
 		super.fromNBT(nbt);
 		this.tick = nbt.getInt(TICK);
+	}
+	
+	@Override
+	public boolean isValid() {
+		return true;
 	}
 }

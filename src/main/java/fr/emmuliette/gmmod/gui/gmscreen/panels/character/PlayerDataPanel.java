@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.panels.character;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
+import fr.emmuliette.gmmod.gui.gmscreen.components.ContainerPanel;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.AirWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData.ArmorWidget;
@@ -31,7 +32,7 @@ public class PlayerDataPanel extends ContainerPanel {
 	private LivingEntity entity;
 	private List<ScrollableWidget> childrens;
 
-	public PlayerDataPanel(SheetPanel panel, int ratio) {
+	public PlayerDataPanel(CharacterPanel panel, int ratio) {
 		super(panel, ratio);
 		childrens = new ArrayList<ScrollableWidget>();
 		childrens.add(new PosWidget(this));
@@ -126,7 +127,7 @@ public class PlayerDataPanel extends ContainerPanel {
 
 	@Override
 	public int getHeight() {
-		int newHeight = 16 + SheetPanel.PADDING * 2 + SheetPanel.BORDER * 2;
+		int newHeight = 16 + CharacterPanel.PADDING * 2 + CharacterPanel.BORDER * 2;
 		for (ScrollableWidget w : childrens) {
 			if (w.visible)
 				newHeight += w.getHeight();

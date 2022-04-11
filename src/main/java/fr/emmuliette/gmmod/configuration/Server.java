@@ -5,11 +5,10 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class Server {
 	private static final boolean defaultCreativeGM = true;
-	private static final double defaultDefaultRegenTimer = 10., defaultRegenLevelStep = 1.,
-			defaultStrongStomachMax = 1.5;
+	private static final int defaultDefaultRegenTimer = 10, defaultRegenLevelStep = 1, defaultStrongStomachMax = 15;
 
 	public final ConfigValue<Boolean> creativeGM;
-	public final ConfigValue<Double> defaultRegenTimer, regenLevelStep, strongStomachMax;
+	public final ConfigValue<Integer> defaultRegenTimer, regenLevelStep, strongStomachMax;
 
 	public Server(ForgeConfigSpec.Builder builder) {
 		builder.push("Game Master");

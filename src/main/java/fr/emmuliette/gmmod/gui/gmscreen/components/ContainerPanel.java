@@ -1,9 +1,10 @@
-package fr.emmuliette.gmmod.gui.gmscreen.panels;
+package fr.emmuliette.gmmod.gui.gmscreen.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterPanel;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
@@ -14,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public abstract class ContainerPanel extends ScrollableWidget {
 	private final static TextComponent TXT = new TextComponent("");
 
-	public ContainerPanel(SheetPanel panel, int ratio) {
+	public ContainerPanel(CharacterPanel panel, int ratio) {
 		super(panel, 0, 0, 0, 0, ratio, TXT);
 	}
 
@@ -27,7 +28,7 @@ public abstract class ContainerPanel extends ScrollableWidget {
 	}
 
 	private void drawBackground(int baseY, Tesselator tess) {
-		drawBorder(tess, this.x, this.y + baseY, this.width, this.height, SheetPanel.PADDING, SheetPanel.BORDER);
+		drawBorder(tess, this.x, this.y + baseY, this.width, this.height, CharacterPanel.PADDING, CharacterPanel.BORDER);
 	}
 
 	protected abstract void updateVisible();

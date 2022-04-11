@@ -3,8 +3,8 @@ package fr.emmuliette.gmmod.characterSheet.stats.attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
-public class FlyingSpeed extends AttributeStat {
-	public FlyingSpeed() {
-		super(Attributes.FLYING_SPEED, AttributeModifier.Operation.ADDITION, 10);
+public class SpawnReinforcements extends AttributeStat {
+	public SpawnReinforcements() {
+		super(Attributes.SPAWN_REINFORCEMENTS_CHANCE, AttributeModifier.Operation.ADDITION);
 	}
 }

@@ -4,8 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
-import fr.emmuliette.gmmod.gui.gmscreen.panels.PlayerDataPanel;
-import fr.emmuliette.gmmod.gui.gmscreen.widgets.InternalSWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.components.InternalSWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.PlayerDataPanel;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
@@ -153,7 +153,8 @@ public class HealthWidget extends InternalSWidget {
 
 	@Override
 	protected void checkVisible(int mouseX, int mouseY, int baseY) {
-		visible = (parent.getEntity() != null && (parent.getEntity() instanceof Player)
-				&& !((Player) parent.getEntity()).isCreative());
+		visible = parent.getEntity() != null &&
+				((parent.getEntity() instanceof Player && !((Player) parent.getEntity()).isCreative())
+						|| !(parent.getEntity() instanceof Player));
 	}
 }
