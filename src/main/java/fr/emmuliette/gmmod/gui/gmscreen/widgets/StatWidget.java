@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.gui.gmscreen.components.InternalSWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.components.ScrollButton;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.character.StatPanel;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -14,27 +13,38 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class StatWidget extends InternalSWidget {
-	public static final int WIDTH = 238;
+	public static final int PADDING_TOTAL = 58;
 	private Stat stat;
 	private Button minus, plus;
-	private StatPanel parent;
+	private StatWidgetListener parent;
+	private int scoreX;
 
-	public StatWidget(StatPanel panel, int x, int y, Stat stat) {
-		super(panel.getParent(), x, y, WIDTH, 18, stat.getName());
-		this.parent = panel;
+	public StatWidget(StatWidgetListener parent, int x, int y, Stat stat) {
+		super(parent.getParent(), x, y, 0, 18, stat.getName());
+		this.parent = parent;
 		this.stat = stat;
-		this.minus = new ScrollButton(panel.getParent(), x + 200, y, 16, 16, new TextComponent("-"),
-				button -> valueDown());
-		this.plus = new ScrollButton(panel.getParent(), x + 220, y, 16, 16, new TextComponent("+"),
-				button -> valueUp());
+		this.minus = new ScrollButton(parent.getParent(), x, y, 16, 16, new TextComponent("-"), button -> valueDown());
+		this.plus = new ScrollButton(parent.getParent(), x, y, 16, 16, new TextComponent("+"), button -> valueUp());
+		this.scoreX = x;
+	}
+
+	public int getTextWidth() {
+		return parent.getParent().getFont().width(stat.getName());
+	}
+
+	public void setTextWidth(int width) {
+		this.width = width + 58; // pad (4) + valeur (24) + pad (4) + bouton (16) + pad (2) + bouton (16)
+		this.scoreX = this.x + width + 4;
+		this.minus.x = this.scoreX + 28;
+		this.plus.x = this.minus.x + 18;
 	}
 
 	private void valueUp() {
-		this.stat.setValue(this.stat.getValue() + 1);
+		parent.onValueUp(stat);
 	}
 
 	private void valueDown() {
-		this.stat.setValue(this.stat.getValue() - 1);
+		parent.onValueDown(stat);
 	}
 
 	@Override
@@ -49,9 +59,9 @@ public class StatWidget extends InternalSWidget {
 	public void render(PoseStack stack, int mouseX, int mouseY, float partialTick, int entryRight, int baseY,
 			Tesselator tess) {
 		if (this.visible) {
-			drawString(stack, parent.getParent().getFont(), stat.getName(), this.x, this.y + baseY, 16777215);
-			drawString(stack, parent.getParent().getFont(), "" + stat.getValue(), this.x + 150, this.y + baseY,
-					16777215);
+			String statValue = "" + stat.getBaseValue() + ((stat.hasBonus()) ? " (+" + stat.getTotalBonus() + ")" : "");
+			drawString(stack, parent.getParent().getFont(), stat.getName(), this.x, 6 + this.y + baseY, 16777215);
+			drawString(stack, parent.getParent().getFont(), statValue, scoreX, 6 + this.y + baseY, 16777215);
 
 			this.minus.y = this.y + baseY;
 			this.plus.y = this.y + baseY;
@@ -67,7 +77,6 @@ public class StatWidget extends InternalSWidget {
 
 	@Override
 	public void renderToolTip(PoseStack stack, int mouseX, int mouseY) {
-//		super.renderToolTip(stack, mouseX, mouseY);
 		drawString(stack, parent.getParent().getFont(), stat.getTooltip(), mouseX, mouseY, 16777215);
 	}
 

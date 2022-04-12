@@ -7,26 +7,27 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
+import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel;
 import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel.ScrollData;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterPanel;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 
 public abstract class ScrollableWidget extends AbstractWidget {
-	private CharacterPanel parent;
+	private CustomScrollPanel parent;
 	private int ratio;
 
-	public ScrollableWidget(CharacterPanel panel, int x, int y, int width, int height, Component message) {
+	public ScrollableWidget(CustomScrollPanel panel, int x, int y, int width, int height, Component message) {
 		this(panel, x, y, width, height, width, message);
 	}
 
-	public ScrollableWidget(CharacterPanel panel, int x, int y, int width, int height, int ratio, Component message) {
+	public ScrollableWidget(CustomScrollPanel panel, int x, int y, int width, int height, int ratio,
+			Component message) {
 		super(x, y, width, height, message);
 		parent = panel;
 		this.ratio = ratio;
-		if(ratio <= 0)
+		if (ratio <= 0)
 			// TODO throw error
 			return;
 	}
@@ -44,15 +45,19 @@ public abstract class ScrollableWidget extends AbstractWidget {
 		render(poseStack, mouseX, mouseY, partialTick, data.right, data.baseY, data.tess);
 	}
 
+	protected void setX(int newX) {
+		this.x = newX;
+	}
+
 	protected void centerX(ScrollableWidget widget) {
-		widget.x = centerX(widget.width);
+		widget.setX(centerX(widget.width));
 	}
 
 	protected int centerX(int widgetWidth) {
 		return this.x + (this.width / 2 - widgetWidth / 2);
 	}
 
-	public CharacterPanel getParent() {
+	public CustomScrollPanel getParent() {
 		return parent;
 	}
 

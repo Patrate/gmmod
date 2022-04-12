@@ -7,27 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.emmuliette.gmmod.GmMod;
+import fr.emmuliette.gmmod.characterSheet.jobs.Job;
+import fr.emmuliette.gmmod.characterSheet.jobs.JobTemplate;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.Armor;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.ArmorToughness;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackDamage;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackKnockback;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.AttackSpeed;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.FlyingSpeed;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.FollowRange;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.JumpStrength;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.KnockbackResistance;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.Luck;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.MaxHealth;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.MovementSpeed;
-import fr.emmuliette.gmmod.characterSheet.stats.attributes.SpawnReinforcements;
-import fr.emmuliette.gmmod.characterSheet.stats.gmmod.HealthRegen;
-import fr.emmuliette.gmmod.characterSheet.stats.gmmod.StrongStomach;
 import fr.emmuliette.gmmod.exceptions.DuplicateStatException;
+import fr.emmuliette.gmmod.exceptions.InvalidStatException;
 import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.MissingStatException;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
-import fr.emmuliette.gmmod.jobs.Job;
 import fr.emmuliette.gmmod.packets.PacketHandler;
 import fr.emmuliette.gmmod.packets.SheetPacket;
 import net.minecraft.core.Direction;
@@ -56,7 +43,7 @@ import net.minecraftforge.fml.common.Mod;
 
 public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	private LivingEntity owner;
-	private Map<Job, Integer> jobs;
+	private Map<String, Job> jobs;
 	private Map<Class<? extends Stat>, Stat> stats;
 
 	public CharacterSheet() {
@@ -66,7 +53,7 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 
 	public CharacterSheet(LivingEntity owner) {
 		this.owner = owner;
-		jobs = new HashMap<Job, Integer>();
+		jobs = new HashMap<String, Job>();
 		initStatsInternal();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -77,22 +64,9 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	private void initStatsInternal() {
 		stats = new HashMap<Class<? extends Stat>, Stat>();
 		try {
-			addStat(Armor.class);
-			addStat(ArmorToughness.class);
-			addStat(AttackDamage.class);
-			addStat(AttackKnockback.class);
-			addStat(AttackSpeed.class);
-			addStat(FlyingSpeed.class);
-			addStat(KnockbackResistance.class);
-			addStat(Luck.class);
-			addStat(MaxHealth.class);
-			addStat(MovementSpeed.class);
-			addStat(FollowRange.class);
-			addStat(JumpStrength.class);
-			addStat(SpawnReinforcements.class);
-
-			addStat(HealthRegen.class);
-			addStat(StrongStomach.class);
+			for (Class<? extends Stat> statClass : Stat.getAllStats()) {
+				addStat(statClass);
+			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -100,6 +74,21 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			e.printStackTrace();
 		}
 		initStats();
+	}
+
+	public void postInit() {
+		for (Stat stat : stats.values()) {
+			try {
+				stat.init();
+			} catch (StatOutOfBoundsException | MissingSheetDataException e) {
+				GmMod.logger().warn("Error during Stat " + stat.getKey() + " init: " + e.getMessage());
+			} catch (InvalidStatException e) {
+				// Can silently ignore
+			}
+		}
+		for (Job job : jobs.values()) {
+			job.init();
+		}
 	}
 
 	public LivingEntity getOwner() {
@@ -110,12 +99,37 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		this.owner = owner;
 	}
 
-	public Map<Job, Integer> getJobs() {
-		return jobs;
+	public void addJob(JobTemplate template) {
+		if (hasJob(template.getName()))
+			// TODO throw error ? No
+			return;
+		Job job = template.getJob(this);
+		jobs.put(template.getName(), job);
 	}
 
-	public void setJobs(Map<Job, Integer> jobs) {
-		this.jobs = jobs;
+	private void syncJob(JobTemplate template, int level) {
+		if (!this.hasJob(template.getName()))
+			this.addJob(template);
+		this.getJob(template.getName()).setLevel(level);
+	}
+
+	public Collection<Job> getJobs() {
+		return jobs.values();
+	}
+
+	public boolean hasJob(String key) {
+		return jobs.containsKey(key);
+	}
+
+	public Job getJob(String key) {
+		return jobs.get(key);
+	}
+
+	public void levelUpJob(String key) {
+		if (!hasJob(key))
+			// TODO throw error
+			return;
+		getJob(key).levelUp();
 	}
 
 	public Collection<Stat> getStats() {
@@ -150,11 +164,13 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			// TODO throw error
 			return;
 		}
-		stats.get(statClass).setValue(d);
+		stats.get(statClass).setBaseValue(d);
 		sync();
 	}
 
-	// ====================================
+	// ==================================== LEVELING ?
+
+	// ==================================== SYNC & DATA
 
 	public void sync(ServerPlayer player) {
 		player.getCapability(CharacterSheet.SHEET_CAPABILITY).ifPresent(c -> c.sync());
@@ -164,7 +180,21 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 		this.owner = other.owner;
 		initStatsInternal();
 		for (Class<? extends Stat> statClass : other.stats.keySet()) {
-			this.setStat(statClass, other.stats.get(statClass).getValue());
+			try {
+				Stat otherStat = other.stats.get(statClass);
+				this.setStat(statClass, otherStat.getBaseValue());
+				if (otherStat.hasBonus()) {
+					Map<String, Integer> otherMap = otherStat.getBonusMap();
+					for (String bonusKey : otherMap.keySet()) {
+						this.getStat(statClass).setBonus(bonusKey, otherMap.get(bonusKey));
+					}
+				}
+			} catch (MissingStatException e) {
+				e.printStackTrace();
+			}
+		}
+		for (Job job : other.jobs.values()) {
+			this.syncJob(job.template(), job.getLevel());
 		}
 	}
 
@@ -177,12 +207,19 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 	@Override
 	public CompoundTag serializeNBT() {
 		CompoundTag retour = new CompoundTag();
-		CompoundTag statsTag = new CompoundTag();
 
+		CompoundTag statsTag = new CompoundTag();
 		for (Stat stat : stats.values()) {
 			stat.toNBT(statsTag);
 		}
 		retour.put("stats", statsTag);
+
+		CompoundTag jobsTag = new CompoundTag();
+		for (Job job : jobs.values()) {
+			job.toNBT(jobsTag);
+		}
+		retour.put("jobs", jobsTag);
+
 		return retour;
 	}
 
@@ -209,6 +246,15 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+
+		CompoundTag jobsTag = nbt.getCompound("jobs");
+		for (String key : jobsTag.getAllKeys()) {
+			// TODO get the jobs template from key
+			JobTemplate template = JobTemplate.getTemplate(key);
+			// TODO create the job at X level
+			this.addJob(template);
+			this.getJob(key).fromNBT(jobsTag.getCompound(key));
 		}
 	}
 
@@ -284,16 +330,6 @@ public class CharacterSheet implements ICapabilitySerializable<CompoundTag> {
 			if (!player.level.isClientSide) {
 				player.getCapability(CharacterSheet.SHEET_CAPABILITY).ifPresent(c -> c.sync(player));
 				player.getCapability(CharacterSheet.SHEET_CAPABILITY).ifPresent(c -> c.postInit());
-			}
-		}
-	}
-
-	public void postInit() {
-		for (Stat stat : stats.values()) {
-			try {
-				stat.init();
-			} catch (StatOutOfBoundsException | MissingSheetDataException e) {
-				GmMod.logger().warn("Error during Stat " + stat.getKey() + " init: " + e.getMessage());
 			}
 		}
 	}

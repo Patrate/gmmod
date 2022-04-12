@@ -4,14 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel.ScrollData;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterPanel;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
 public class ScrollButton extends Button {
-	private CharacterPanel parent;
+	private CustomScrollPanel parent;
 
-	public ScrollButton(CharacterPanel parent, int x, int y, int width, int height, Component title, OnPress onPress) {
+	public ScrollButton(CustomScrollPanel parent, int x, int y, int width, int height, Component title,
+			OnPress onPress) {
 		super(x, y, width, height, title, onPress);
 		this.parent = parent;
 	}

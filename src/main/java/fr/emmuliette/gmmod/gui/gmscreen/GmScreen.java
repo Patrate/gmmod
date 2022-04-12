@@ -1,5 +1,8 @@
 package fr.emmuliette.gmmod.gui.gmscreen;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -23,6 +26,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,7 +42,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 
 	private TabsWidget tabs;
 
-	private CharacterListWidget playerList;
+	private CharacterListWidget charactersList;
 	private JobsLeftPanel jobsLeftPanel;
 
 	private CharacterPanel characterPanel;
@@ -73,8 +77,9 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 
 	@Override
 	protected void init() {
-		this.playerList = new CharacterListWidget(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING, 18);
-		this.addRenderableWidget(playerList);
+		tickables = new HashSet<Tickable>();
+		this.charactersList = new CharacterListWidget(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING, 18);
+		this.addRenderableWidget(charactersList);
 
 		this.jobsLeftPanel = new JobsLeftPanel(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING);
 		this.addRenderableWidget(jobsLeftPanel);
@@ -86,20 +91,20 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 		tabs.addTab(GM_SCREEN_RESOURCE, 75, 1, 14, 10, "gui.gmscreen.rules");
 		this.addRenderableWidget(tabs);
 
-		this.characterPanel = new CharacterPanel(minecraft, this, (width - playerList.getRight()), height, 0,
-				playerList.getRight());
+		this.characterPanel = new CharacterPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
+				charactersList.getRight());
 		this.addRenderableWidget(characterPanel);
 
-		this.jobsPanel = new JobsPanel(minecraft, this, (width - playerList.getRight()), height, 0,
-				playerList.getRight());
+		this.jobsPanel = new JobsPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
+				charactersList.getRight());
 		this.addRenderableWidget(characterPanel);
 
-		this.skillsPanel = new SkillsPanel(minecraft, this, (width - playerList.getRight()), height, 0,
-				playerList.getRight());
+		this.skillsPanel = new SkillsPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
+				charactersList.getRight());
 		this.addRenderableWidget(characterPanel);
 
-		this.rulesPanel = new RulesPanel(minecraft, this, (width - playerList.getRight()), height, 0,
-				playerList.getRight());
+		this.rulesPanel = new RulesPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
+				charactersList.getRight());
 		this.addRenderableWidget(characterPanel);
 	}
 
@@ -108,6 +113,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 		renderBackground(stack);
 		Tesselator tesselator = Tesselator.getInstance();
 		BufferBuilder bufferbuilder = tesselator.getBuilder();
+
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -116,54 +122,26 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 				.uv((float) 0 / 32.0F, (float) (this.height) / 32.0F).color(32, 32, 32, 255).endVertex();
 		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) this.height, 0.0D)
 				.uv((float) LEFT_PANEL_WIDTH / 32.0F, (float) (this.height) / 32.0F).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) LEFT_PANEL_PADDING, 0.0D)
-				.uv((float) LEFT_PANEL_WIDTH / 32.0F, (float) (LEFT_PANEL_PADDING) / 32.0F).color(32, 32, 32, 255)
-				.endVertex();
-		bufferbuilder.vertex((double) 0, (double) LEFT_PANEL_PADDING, 0.0D)
-				.uv((float) 0 / 32.0F, (float) (LEFT_PANEL_PADDING) / 32.0F).color(32, 32, 32, 255).endVertex();
+		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) 0D, 0.0D)
+				.uv((float) LEFT_PANEL_WIDTH / 32.0F, (float) (0D) / 32.0F).color(32, 32, 32, 255).endVertex();
+		bufferbuilder.vertex((double) 0, (double) 0d, 0.0D).uv((float) 0 / 32.0F, (float) (0) / 32.0F)
+				.color(32, 32, 32, 255).endVertex();
 		tesselator.end();
 
-//		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-//		RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
-//		RenderSystem.enableDepthTest();
-//		RenderSystem.depthFunc(519);
-//		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-//		bufferbuilder.vertex((double) 0, (double) 0d, -100.0D).uv(0.0F, (float) 0d / 32.0F).color(64, 64, 64, 255)
-//				.endVertex();
-//		bufferbuilder.vertex((double) (0 + this.width), (double) 0d, -100.0D)
-//				.uv((float) this.width / 32.0F, (float) 0d / 32.0F).color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) (0 + this.width), 0.0D, -100.0D).uv((float) this.width / 32.0F, 0.0F)
-//				.color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) 0, 0.0D, -100.0D).uv(0.0F, 0.0F).color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) 0, (double) this.height, -100.0D).uv(0.0F, (float) this.height / 32.0F)
-//				.color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) (0 + this.width), (double) this.height, -100.0D)
-//				.uv((float) this.width / 32.0F, (float) this.height / 32.0F).color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) (0 + this.width), (double) LEFT_PANEL_PADDING, -100.0D)
-//				.uv((float) this.width / 32.0F, (float) LEFT_PANEL_PADDING / 32.0F).color(64, 64, 64, 255).endVertex();
-//		bufferbuilder.vertex((double) 0, (double) LEFT_PANEL_PADDING, -100.0D)
-//				.uv(0.0F, (float) LEFT_PANEL_PADDING / 32.0F).color(64, 64, 64, 255).endVertex();
-//		tesselator.end();
-//		RenderSystem.depthFunc(515);
-//		RenderSystem.disableDepthTest();
-//		RenderSystem.enableBlend();
-//		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-//				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO,
-//				GlStateManager.DestFactor.ONE);
-//		RenderSystem.disableTexture();
-//		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-//		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-//		bufferbuilder.vertex((double) 0, (double) (0d + 4), 0.0D).color(0, 0, 0, 0).endVertex();
-//		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) (0d + 4), 0.0D).color(0, 0, 0, 0).endVertex();
-//		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) 0d, 0.0D).color(0, 0, 0, 255).endVertex();
-//		bufferbuilder.vertex((double) 0, (double) 0d, 0.0D).color(0, 0, 0, 255).endVertex();
-//		bufferbuilder.vertex((double) 0, (double) LEFT_PANEL_PADDING, 0.0D).color(0, 0, 0, 255).endVertex();
-//		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) LEFT_PANEL_PADDING, 0.0D).color(0, 0, 0, 255)
-//				.endVertex();
-//		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) (LEFT_PANEL_PADDING - 4), 0.0D).color(0, 0, 0, 0)
-//				.endVertex();
-//		bufferbuilder.vertex((double) 0, (double) (LEFT_PANEL_PADDING - 4), 0.0D).color(0, 0, 0, 0).endVertex();
-//		tesselator.end();
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		bufferbuilder.vertex((double) 0, (double) LEFT_PANEL_PADDING, 0.0D)
+				.uv((float) 0 / 32.0F, (float) (LEFT_PANEL_PADDING) / 32.0F).color(64, 64, 64, 255).endVertex();
+		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) LEFT_PANEL_PADDING, 0.0D)
+				.uv((float) LEFT_PANEL_WIDTH / 32.0F, (float) (LEFT_PANEL_PADDING) / 32.0F).color(64, 64, 64, 255)
+				.endVertex();
+		bufferbuilder.vertex((double) LEFT_PANEL_WIDTH, (double) 0D, 0.0D)
+				.uv((float) LEFT_PANEL_WIDTH / 32.0F, (float) (0D) / 32.0F).color(64, 64, 64, 255).endVertex();
+		bufferbuilder.vertex((double) 0, (double) 0d, 0.0D).uv((float) 0 / 32.0F, (float) (0) / 32.0F)
+				.color(64, 64, 64, 255).endVertex();
+		tesselator.end();
 
 		super.render(stack, mouseX, mouseY, partialTick);
 	}
@@ -193,7 +171,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 			skillsPanel.setVisible(false);
 			rulesPanel.setVisible(false);
 
-			playerList.setVisible(true);
+			charactersList.setVisible(true);
 			jobsLeftPanel.visible = false;
 			break;
 
@@ -203,7 +181,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 			skillsPanel.setVisible(false);
 			rulesPanel.setVisible(false);
 
-			playerList.setVisible(false);
+			charactersList.setVisible(false);
 			jobsLeftPanel.visible = true;
 			break;
 
@@ -213,7 +191,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 			skillsPanel.setVisible(true);
 			rulesPanel.setVisible(false);
 
-			playerList.setVisible(false);
+			charactersList.setVisible(false);
 			jobsLeftPanel.visible = false;
 			break;
 
@@ -223,7 +201,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 			skillsPanel.setVisible(false);
 			rulesPanel.setVisible(true);
 
-			playerList.setVisible(false);
+			charactersList.setVisible(false);
 			jobsLeftPanel.visible = false;
 			break;
 
@@ -233,8 +211,26 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 			skillsPanel.setVisible(false);
 			rulesPanel.setVisible(false);
 
-			playerList.setVisible(false);
+			charactersList.setVisible(false);
 			jobsLeftPanel.visible = false;
 		}
+	}
+
+	private Set<Tickable> tickables;
+
+	public void registerTickable(Tickable t) {
+		tickables.add(t);
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		for (Tickable t : tickables) {
+			t.tick();
+		}
+	}
+
+	public void refreshCharactersList() {
+		charactersList.refreshList();
 	}
 }

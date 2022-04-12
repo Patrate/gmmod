@@ -5,6 +5,7 @@ import java.util.Set;
 
 import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.stats.Stat;
+import fr.emmuliette.gmmod.exceptions.InvalidStatException;
 import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,7 +42,7 @@ public abstract class AttributeStat extends Stat {
 	}
 
 	@Override
-	public void onChange(int oldValue, int newValue) throws StatOutOfBoundsException, MissingSheetDataException {
+	public void onChange(int oldValue, int newValue) throws StatOutOfBoundsException, MissingSheetDataException, InvalidStatException {
 		super.onChange(oldValue, newValue);
 		LivingEntity owner = getOwner();
 		if (owner != null) {
@@ -56,7 +57,6 @@ public abstract class AttributeStat extends Stat {
 				}
 			}
 			double modifier = ((double) newValue) * 1d / ratio;
-			GmMod.logger().debug("Modifier is " + modifier);
 			owner.getAttribute(attribute).addPermanentModifier(new AttributeModifier(name, modifier, operation));
 			for (AttributeModifier am : olds) {
 				owner.getAttribute(attribute).removeModifier(am);
@@ -65,7 +65,7 @@ public abstract class AttributeStat extends Stat {
 	}
 
 	@Override
-	public void init() throws StatOutOfBoundsException, MissingSheetDataException {
+	public void init() throws StatOutOfBoundsException, MissingSheetDataException, InvalidStatException {
 		onChange(0, this.getValue());
 	}
 

@@ -157,6 +157,30 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
+	public boolean keyPressed(int p_94710_, int p_94711_, int p_94712_) {
+		for (ScrollableWidget w : widgets()) {
+			if (w.keyPressed(p_94710_, p_94711_, p_94712_))
+				return true;
+		}
+		return super.keyPressed(p_94710_, p_94711_, p_94712_);
+	}
+
+	public boolean keyReleased(int p_94715_, int p_94716_, int p_94717_) {
+		for (ScrollableWidget w : widgets()) {
+			if (w.keyReleased(p_94715_, p_94716_, p_94717_))
+				return true;
+		}
+		return super.keyReleased(p_94715_, p_94716_, p_94717_);
+	}
+
+	public boolean charTyped(char p_94683_, int p_94684_) {
+		for (ScrollableWidget w : widgets()) {
+			if (w.charTyped(p_94683_, p_94684_))
+				return true;
+		}
+		return super.charTyped(p_94683_, p_94684_);
+	}
+
 	@Override
 	public NarrationPriority narrationPriority() {
 		return NarrationPriority.HOVERED;

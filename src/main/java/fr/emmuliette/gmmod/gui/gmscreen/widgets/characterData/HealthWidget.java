@@ -1,11 +1,11 @@
-package fr.emmuliette.gmmod.gui.gmscreen.widgets.playerData;
+package fr.emmuliette.gmmod.gui.gmscreen.widgets.characterData;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import fr.emmuliette.gmmod.gui.gmscreen.components.InternalSWidget;
-import fr.emmuliette.gmmod.gui.gmscreen.panels.character.PlayerDataPanel;
+import fr.emmuliette.gmmod.gui.gmscreen.panels.character.CharacterDataPanel;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
@@ -18,9 +18,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HealthWidget extends InternalSWidget {
 	public static final int WIDTH = 84;
-	private PlayerDataPanel parent;
+	private CharacterDataPanel parent;
 
-	public HealthWidget(PlayerDataPanel parent) {
+	public HealthWidget(CharacterDataPanel parent) {
 		super(parent.getParent(), WIDTH, 9, new TextComponent("Health"));
 		this.parent = parent;
 	}

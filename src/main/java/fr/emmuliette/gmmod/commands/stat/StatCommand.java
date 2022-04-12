@@ -67,7 +67,7 @@ public class StatCommand {
 				continue;
 			}
 			try {
-				sheet.getStat(stat).setValue(amount);
+				sheet.getStat(stat).setBaseValue(amount);
 				++i;
 			} catch (MissingStatException e) {
 				// TODO send error to caller
@@ -118,7 +118,7 @@ public class StatCommand {
 		StringBuilder result = new StringBuilder();
 		if (stat == null) {
 			for (Stat s : sheet.getStats()) {
-				if (s.getValue() != 0)
+//				if (s.getValue() != 0)
 					result.append(s.getClass().getSimpleName() + " " + s.getValue() + "\n");
 			}
 		} else {

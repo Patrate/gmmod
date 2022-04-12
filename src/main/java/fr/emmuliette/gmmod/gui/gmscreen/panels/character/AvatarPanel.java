@@ -19,7 +19,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class AvatarPanel extends ContainerPanel {
+public class AvatarPanel extends ContainerPanel<CharacterSheet> {
 	LivingEntity entity;
 
 	public AvatarPanel(CharacterPanel panel, int ratio) {

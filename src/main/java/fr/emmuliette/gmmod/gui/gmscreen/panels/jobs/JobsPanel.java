@@ -1,6 +1,6 @@
 package fr.emmuliette.gmmod.gui.gmscreen.panels.jobs;
 
-import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
+import fr.emmuliette.gmmod.characterSheet.jobs.JobTemplate;
 import fr.emmuliette.gmmod.gui.gmscreen.GmScreen;
 import fr.emmuliette.gmmod.gui.gmscreen.components.CustomScrollPanel;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class JobsPanel extends CustomScrollPanel {
 	public final static int PADDING = 2, BORDER = 2, BAR_SIZE = 6;
 
-//	private StatPanel stats;
+	private StatBlockPanel stats;
 //	private PlayerDataPanel playerData;
 //	private AvatarPanel avatar;
 
@@ -26,13 +26,13 @@ public class JobsPanel extends CustomScrollPanel {
 //		addWidget(avatar, 1);
 //		this.playerData = new PlayerDataPanel(this, 2);
 //		addWidget(playerData, 1);
-//		this.stats = new StatPanel(this, 1);
-//		addWidget(stats, 2);
+		this.stats = new StatBlockPanel(this, 1);
+		addWidget(stats, 1);
 	}
 
-	public void setInfo(CharacterSheet sheet) {
+	public void setInfo(JobTemplate job) {
 		this.scrollDistance = 0f;
-//		this.stats.updateContent(sheet);
+		this.stats.updateContent(job);
 //		this.playerData.updateContent(sheet);
 //		this.avatar.updateContent(sheet);
 		getContentHeight();
@@ -40,7 +40,7 @@ public class JobsPanel extends CustomScrollPanel {
 	}
 
 	void clearInfo() {
-//		this.stats.clearContent();
+		this.stats.clearContent();
 //		this.playerData.clearContent();
 //		this.avatar.clearContent();
 	}

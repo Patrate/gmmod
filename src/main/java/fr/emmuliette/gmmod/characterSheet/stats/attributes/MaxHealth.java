@@ -1,5 +1,6 @@
 package fr.emmuliette.gmmod.characterSheet.stats.attributes;
 
+import fr.emmuliette.gmmod.exceptions.InvalidStatException;
 import fr.emmuliette.gmmod.exceptions.MissingSheetDataException;
 import fr.emmuliette.gmmod.exceptions.StatOutOfBoundsException;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -11,7 +12,8 @@ public class MaxHealth extends AttributeStat {
 	}
 
 	@Override
-	public void onChange(int oldValue, int newValue) throws StatOutOfBoundsException, MissingSheetDataException {
+	public void onChange(int oldValue, int newValue)
+			throws StatOutOfBoundsException, MissingSheetDataException, InvalidStatException {
 		super.onChange(oldValue, newValue);
 		if (oldValue > newValue) {
 			if (getOwner().getHealth() > getOwner().getMaxHealth())

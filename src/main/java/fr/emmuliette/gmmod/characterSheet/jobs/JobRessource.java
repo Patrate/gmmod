@@ -1,4 +1,4 @@
-package fr.emmuliette.gmmod.jobs;
+package fr.emmuliette.gmmod.characterSheet.jobs;
 
 import java.awt.Color;
 

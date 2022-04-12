@@ -1,8 +1,5 @@
 package fr.emmuliette.gmmod.gui.gmscreen.panels.character;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
@@ -11,31 +8,36 @@ import fr.emmuliette.gmmod.characterSheet.stats.Stat;
 import fr.emmuliette.gmmod.gui.gmscreen.components.ContainerPanel;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.ScrollableWidget;
 import fr.emmuliette.gmmod.gui.gmscreen.widgets.StatWidget;
+import fr.emmuliette.gmmod.gui.gmscreen.widgets.StatWidgetListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class StatPanel extends ContainerPanel {
-	private final List<ScrollableWidget> childrens;
+public class CharacterStatsPanel extends ContainerPanel<CharacterSheet> implements StatWidgetListener {
 
-	public StatPanel(CharacterPanel panel, int ratio) {
+	public CharacterStatsPanel(CharacterPanel panel, int ratio) {
 		super(panel, ratio);
-		childrens = new ArrayList<ScrollableWidget>();
 	}
 
 	public void clearContent() {
-		childrens.clear();
+		clearChildrens();
 	}
 
 	public void updateContent(CharacterSheet sheet) {
-		childrens.clear();
+		clearChildrens();
 		int i = 0;
+		int biggest = 0;
 		for (Stat stat : sheet.getStats()) {
-			getParent();
-			childrens.add(new StatWidget(this, centerX(StatWidget.WIDTH), CharacterPanel.BORDER + this.y + i * 20, stat));
+			StatWidget w = new StatWidget(this, 0, CharacterPanel.BORDER + this.y + i * 20, stat);
+			addChildren(w);
+			biggest = (w.getTextWidth() > biggest) ? w.getTextWidth() : biggest;
 			i++;
 		}
-		getParent();
+		int newX = centerX(biggest + StatWidget.PADDING_TOTAL);
+		for (ScrollableWidget w : getChildrens()) {
+			w.x = newX;
+			((StatWidget) w).setTextWidth(biggest);
+		}
 		this.height = i * 20 + CharacterPanel.PADDING * 2 + CharacterPanel.BORDER * 2;
 	}
 
@@ -44,7 +46,7 @@ public class StatPanel extends ContainerPanel {
 		int diff = super.setScrollY(newY);
 		if (diff == 0)
 			return 0;
-		for (ScrollableWidget w : childrens) {
+		for (ScrollableWidget w : getChildrens()) {
 			w.y += diff;
 		}
 		return diff;
@@ -55,7 +57,7 @@ public class StatPanel extends ContainerPanel {
 			Tesselator tess) {
 		super.render(poseStack, mouseX, mouseY, partialTick, entryRight, baseY, tess);
 		if (this.visible) {
-			for (ScrollableWidget w : childrens) {
+			for (ScrollableWidget w : getChildrens()) {
 				w.render(poseStack, mouseX, mouseY, partialTick);
 			}
 		}
@@ -63,12 +65,12 @@ public class StatPanel extends ContainerPanel {
 
 	@Override
 	protected void updateVisible() {
-		this.visible = !childrens.isEmpty();
+		this.visible = !getChildrens().isEmpty();
 	}
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		for (ScrollableWidget w : childrens) {
+		for (ScrollableWidget w : getChildrens()) {
 			if (w.mouseClicked(mouseX, mouseY, button))
 				return true;
 		}
@@ -77,8 +79,18 @@ public class StatPanel extends ContainerPanel {
 
 	@Override
 	public void init() {
-		for (ScrollableWidget w : childrens) {
+		for (ScrollableWidget w : getChildrens()) {
 			centerX(w);
 		}
+	}
+
+	@Override
+	public void onValueUp(Stat stat) {
+		stat.setBaseValue(stat.getBaseValue() + 1);
+	}
+
+	@Override
+	public void onValueDown(Stat stat) {
+		stat.setBaseValue(stat.getBaseValue() - 1);
 	}
 }

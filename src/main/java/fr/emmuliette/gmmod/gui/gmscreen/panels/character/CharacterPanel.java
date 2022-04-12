@@ -12,9 +12,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class CharacterPanel extends CustomScrollPanel {
 	public final static int PADDING = 2, BORDER = 2, BAR_SIZE = 6;
 
-	private StatPanel stats;
-	private PlayerDataPanel playerData;
 	private AvatarPanel avatar;
+	private CharacterDataPanel playerData;
+	private CharacterJobsPanel jobs;
+	private CharacterStatsPanel stats;
 
 	public CharacterPanel(Minecraft mcIn, GmScreen parent, int widthIn, int heightIn, int top, int left) {
 		super(mcIn, parent, widthIn, heightIn, top, left, PADDING, BORDER, BAR_SIZE);
@@ -24,15 +25,18 @@ public class CharacterPanel extends CustomScrollPanel {
 	protected void init() {
 		this.avatar = new AvatarPanel(this, 1);
 		addWidget(avatar, 1);
-		this.playerData = new PlayerDataPanel(this, 2);
+		this.playerData = new CharacterDataPanel(this, 2);
 		addWidget(playerData, 1);
-		this.stats = new StatPanel(this, 1);
-		addWidget(stats, 2);
+		this.jobs = new CharacterJobsPanel(this, 1);
+		addWidget(jobs, 2);
+		this.stats = new CharacterStatsPanel(this, 1);
+		addWidget(stats, 3);
 	}
 
 	public void setInfo(CharacterSheet sheet) {
 		this.scrollDistance = 0f;
 		this.stats.updateContent(sheet);
+		this.jobs.updateContent(sheet);
 		this.playerData.updateContent(sheet);
 		this.avatar.updateContent(sheet);
 		getContentHeight();
@@ -41,6 +45,7 @@ public class CharacterPanel extends CustomScrollPanel {
 
 	void clearInfo() {
 		this.stats.clearContent();
+		this.jobs.clearContent();
 		this.playerData.clearContent();
 		this.avatar.clearContent();
 	}
