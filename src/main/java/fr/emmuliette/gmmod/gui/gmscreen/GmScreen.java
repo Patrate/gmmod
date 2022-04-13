@@ -12,6 +12,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 
 import fr.emmuliette.gmmod.GmMod;
 import fr.emmuliette.gmmod.characterSheet.CharacterSheet;
+import fr.emmuliette.gmmod.characterSheet.jobs.JobTemplate;
 import fr.emmuliette.gmmod.gui.gmscreen.components.CharacterSelectorListener;
 import fr.emmuliette.gmmod.gui.gmscreen.components.TabSelectorListener;
 import fr.emmuliette.gmmod.gui.gmscreen.components.TabsWidget;
@@ -24,6 +25,7 @@ import fr.emmuliette.gmmod.gui.gmscreen.panels.skills.SkillsPanel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.Tickable;
@@ -44,6 +46,7 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 
 	private CharacterListWidget charactersList;
 	private JobsLeftPanel jobsLeftPanel;
+	private Button newJobButton;
 
 	private CharacterPanel characterPanel;
 	private JobsPanel jobsPanel;
@@ -81,8 +84,11 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 		this.charactersList = new CharacterListWidget(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING, 18);
 		this.addRenderableWidget(charactersList);
 
-		this.jobsLeftPanel = new JobsLeftPanel(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING);
-		this.addRenderableWidget(jobsLeftPanel);
+		this.jobsLeftPanel = new JobsLeftPanel(this, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING, 18);
+		this.addRenderableWidget(getJobsLeftPanel());
+		this.newJobButton = new Button(LEFT_PANEL_WIDTH / 2 - 16, height - 16, 32, 16, new TextComponent("New"),
+				(button) -> selectJobTemplate(JobTemplate.newJobTemplate()));
+		this.addRenderableWidget(this.newJobButton);
 
 		this.tabs = new TabsWidget(this, 0, 0, LEFT_PANEL_WIDTH, LEFT_PANEL_PADDING);
 		tabs.addTab(GM_SCREEN_RESOURCE, 30, 1, 14, 10, "gui.gmscreen.character");
@@ -91,21 +97,18 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 		tabs.addTab(GM_SCREEN_RESOURCE, 75, 1, 14, 10, "gui.gmscreen.rules");
 		this.addRenderableWidget(tabs);
 
-		this.characterPanel = new CharacterPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
-				charactersList.getRight());
+		this.characterPanel = new CharacterPanel(minecraft, this, (width - LEFT_PANEL_WIDTH), height, 0,
+				LEFT_PANEL_WIDTH);
 		this.addRenderableWidget(characterPanel);
 
-		this.jobsPanel = new JobsPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
-				charactersList.getRight());
-		this.addRenderableWidget(characterPanel);
+		this.jobsPanel = new JobsPanel(minecraft, this, (width - LEFT_PANEL_WIDTH), height, 0, LEFT_PANEL_WIDTH);
+		this.addRenderableWidget(jobsPanel);
 
-		this.skillsPanel = new SkillsPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
-				charactersList.getRight());
-		this.addRenderableWidget(characterPanel);
+		this.skillsPanel = new SkillsPanel(minecraft, this, (width - LEFT_PANEL_WIDTH), height, 0, LEFT_PANEL_WIDTH);
+		this.addRenderableWidget(skillsPanel);
 
-		this.rulesPanel = new RulesPanel(minecraft, this, (width - charactersList.getRight()), height, 0,
-				charactersList.getRight());
-		this.addRenderableWidget(characterPanel);
+		this.rulesPanel = new RulesPanel(minecraft, this, (width - LEFT_PANEL_WIDTH), height, 0, LEFT_PANEL_WIDTH);
+		this.addRenderableWidget(rulesPanel);
 	}
 
 	@Override
@@ -158,61 +161,65 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 		characterPanel.setInfo(sheet);
 	}
 
+	public void loadJobTemplate(JobTemplate jt) {
+		if (jt == null) {
+			System.out.println("Job template null");
+			// TODO throw error
+			return;
+		}
+		jobsPanel.setLoadedTemplate(jt);
+		JobTemplate copy = jt.clone();
+		selectJobTemplate(copy);
+	}
+
+	public void selectJobTemplate(JobTemplate jt) {
+		if (jt == null) {
+			System.out.println("Job template null");
+			// TODO throw error
+			return;
+		}
+
+		jobsPanel.setInfo(jt);
+	}
+
 	public Font getFontRenderer() {
 		return font;
 	}
 
 	@Override
 	public void selectTab(int id) {
+		characterPanel.setVisible(false);
+		jobsPanel.setVisible(false);
+		skillsPanel.setVisible(false);
+		rulesPanel.setVisible(false);
+
+		charactersList.setVisible(false);
+		getJobsLeftPanel().setVisible(false);
+		newJobButton.visible = false;
+
 		switch (id) {
 		case TAB_CHARACTER:
 			characterPanel.setVisible(true);
-			jobsPanel.setVisible(false);
-			skillsPanel.setVisible(false);
-			rulesPanel.setVisible(false);
-
 			charactersList.setVisible(true);
-			jobsLeftPanel.visible = false;
+			this.setFocused(characterPanel);
 			break;
 
 		case TAB_JOBS:
-			characterPanel.setVisible(false);
 			jobsPanel.setVisible(true);
-			skillsPanel.setVisible(false);
-			rulesPanel.setVisible(false);
-
-			charactersList.setVisible(false);
-			jobsLeftPanel.visible = true;
+			getJobsLeftPanel().setVisible(true);
+			newJobButton.visible = true;
+			this.setFocused(jobsPanel);
 			break;
 
 		case TAB_SKILLS:
-			characterPanel.setVisible(false);
-			jobsPanel.setVisible(false);
 			skillsPanel.setVisible(true);
-			rulesPanel.setVisible(false);
-
-			charactersList.setVisible(false);
-			jobsLeftPanel.visible = false;
 			break;
 
 		case TAB_RULES:
-			characterPanel.setVisible(false);
-			jobsPanel.setVisible(false);
-			skillsPanel.setVisible(false);
 			rulesPanel.setVisible(true);
-
-			charactersList.setVisible(false);
-			jobsLeftPanel.visible = false;
 			break;
 
 		default:
-			characterPanel.setVisible(false);
-			jobsPanel.setVisible(false);
-			skillsPanel.setVisible(false);
-			rulesPanel.setVisible(false);
-
-			charactersList.setVisible(false);
-			jobsLeftPanel.visible = false;
 		}
 	}
 
@@ -233,4 +240,26 @@ public class GmScreen extends Screen implements CharacterSelectorListener, TabSe
 	public void refreshCharactersList() {
 		charactersList.refreshList();
 	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+		if (characterPanel.visible && characterPanel.isMouseOver(mouseX, mouseY)
+				&& characterPanel.mouseScrolled(mouseX, mouseY, scroll))
+			return true;
+		if (jobsPanel.visible && jobsPanel.isMouseOver(mouseX, mouseY)
+				&& jobsPanel.mouseScrolled(mouseX, mouseY, scroll))
+			return true;
+		if (skillsPanel.visible && skillsPanel.isMouseOver(mouseX, mouseY)
+				&& skillsPanel.mouseScrolled(mouseX, mouseY, scroll))
+			return true;
+		if (rulesPanel.visible && rulesPanel.isMouseOver(mouseX, mouseY)
+				&& rulesPanel.mouseScrolled(mouseX, mouseY, scroll))
+			return true;
+		return super.mouseScrolled(mouseX, mouseY, scroll);
+	}
+
+	public JobsLeftPanel getJobsLeftPanel() {
+		return jobsLeftPanel;
+	}
+
 }

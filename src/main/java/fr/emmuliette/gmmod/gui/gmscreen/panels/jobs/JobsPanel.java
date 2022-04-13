@@ -13,7 +13,8 @@ public class JobsPanel extends CustomScrollPanel {
 	public final static int PADDING = 2, BORDER = 2, BAR_SIZE = 6;
 
 	private StatBlockPanel stats;
-//	private PlayerDataPanel playerData;
+	private JobDataPanel jobData;
+	private JobTemplate loadedTemplate;
 //	private AvatarPanel avatar;
 
 	public JobsPanel(Minecraft mcIn, GmScreen parent, int widthIn, int heightIn, int top, int left) {
@@ -24,29 +25,39 @@ public class JobsPanel extends CustomScrollPanel {
 	protected void init() {
 //		this.avatar = new AvatarPanel(this, 1);
 //		addWidget(avatar, 1);
-//		this.playerData = new PlayerDataPanel(this, 2);
-//		addWidget(playerData, 1);
+		this.jobData = new JobDataPanel(this, 2);
+		addWidget(jobData, 1);
 		this.stats = new StatBlockPanel(this, 1);
-		addWidget(stats, 1);
+		addWidget(stats, 2);
+
 	}
 
 	public void setInfo(JobTemplate job) {
 		this.scrollDistance = 0f;
+		this.jobData.updateContent(job);
 		this.stats.updateContent(job);
-//		this.playerData.updateContent(sheet);
 //		this.avatar.updateContent(sheet);
 		getContentHeight();
 
 	}
 
 	void clearInfo() {
+		this.jobData.clearContent();
 		this.stats.clearContent();
-//		this.playerData.clearContent();
+		setLoadedTemplate(null);
 //		this.avatar.clearContent();
 	}
 
 	@Override
 	public Font getFont() {
 		return ((GmScreen) getParent()).getFontRenderer();
+	}
+
+	public void setLoadedTemplate(JobTemplate loadedTemplate) {
+		this.loadedTemplate = loadedTemplate;
+	}
+
+	public JobTemplate getLoadedTemplate() {
+		return loadedTemplate;
 	}
 }

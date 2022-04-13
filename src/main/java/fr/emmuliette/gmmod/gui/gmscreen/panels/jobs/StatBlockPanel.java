@@ -15,21 +15,26 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class StatBlockPanel extends ContainerPanel<JobTemplate> implements StatWidgetListener {
+	private JobTemplate template;
 
-	public StatBlockPanel(JobsPanel parrent, int ratio) {
-		super(parrent, ratio);
+	public StatBlockPanel(JobsPanel parent, int ratio) {
+		super(parent, ratio);
 	}
 
 	public void clearContent() {
 		clearChildrens();
+		this.template = null;
 	}
 
 	public void updateContent(JobTemplate template) {
 		clearChildrens();
+		this.template = template;
 		int i = 0;
 		int biggest = 0;
 		for (Class<? extends Stat> statClass : Stat.getAllStats()) {
-			StatWidget w = new StatWidget(this, 0, 2 + this.y + i * 20, new DummyStat(statClass));
+			Stat dStat = new DummyStat(statClass);
+			dStat.setBaseValue(template.getStatBlock().getStatPerLevel(statClass));
+			StatWidget w = new StatWidget(this, 0, 2 + this.y + i * 20, dStat);
 			addChildren(w);
 			biggest = (w.getTextWidth() > biggest) ? w.getTextWidth() : biggest;
 			i++;
@@ -79,10 +84,16 @@ public class StatBlockPanel extends ContainerPanel<JobTemplate> implements StatW
 	@Override
 	public void onValueUp(Stat stat) {
 		stat.setBaseValue(stat.getBaseValue() + 1);
+		template.getStatBlock().setStatPerLevel(stat.getClass(), stat.getBaseValue());
 	}
 
 	@Override
 	public void onValueDown(Stat stat) {
 		stat.setBaseValue(stat.getBaseValue() - 1);
+		template.getStatBlock().setStatPerLevel(stat.getClass(), stat.getBaseValue());
+	}
+
+	public void syncToTemplate(Stat stat) {
+
 	}
 }

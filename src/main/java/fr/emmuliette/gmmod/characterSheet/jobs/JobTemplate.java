@@ -33,6 +33,28 @@ public class JobTemplate {
 		this.statBlock = statBlock;
 	}
 
+	public JobTemplate clone() {
+		JobTemplate copy = new JobTemplate(this.name, this.statBlock.clone());
+		return copy;
+	}
+
+	public static boolean saveJobTemplate(JobTemplate template) {
+		if (registry.containsKey(template.name)) {
+			// TODO vérifier que c'est le même et sinon warning overwrite
+		}
+		registry.put(template.name, template);
+		return true;
+	}
+
+	public static boolean deleteJobTemplate(JobTemplate template) {
+		registry.remove(template.name);
+		return true;
+	}
+
+	public static JobTemplate newJobTemplate() {
+		return new JobTemplate("new", new StatBlock());
+	}
+
 	public Job getJob(CharacterSheet owner) {
 		return new Job(this, owner);
 	}

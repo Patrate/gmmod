@@ -153,32 +153,46 @@ public abstract class CustomScrollPanel extends ScrollPanel {
 				if (w.mouseClicked(mouseX, newMouseY, button))
 					return true;
 			}
+			return super.mouseClicked(mouseX, mouseY, button);
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return false;
+
 	}
 
+	@Override
 	public boolean keyPressed(int p_94710_, int p_94711_, int p_94712_) {
-		for (ScrollableWidget w : widgets()) {
-			if (w.keyPressed(p_94710_, p_94711_, p_94712_))
-				return true;
+		if (visible) {
+			for (ScrollableWidget w : widgets()) {
+				if (w.keyPressed(p_94710_, p_94711_, p_94712_))
+					return true;
+			}
+			return super.keyPressed(p_94710_, p_94711_, p_94712_);
 		}
-		return super.keyPressed(p_94710_, p_94711_, p_94712_);
+		return false;
 	}
 
+	@Override
 	public boolean keyReleased(int p_94715_, int p_94716_, int p_94717_) {
-		for (ScrollableWidget w : widgets()) {
-			if (w.keyReleased(p_94715_, p_94716_, p_94717_))
-				return true;
+		if (visible) {
+			for (ScrollableWidget w : widgets()) {
+				if (w.keyReleased(p_94715_, p_94716_, p_94717_))
+					return true;
+			}
+			return super.keyReleased(p_94715_, p_94716_, p_94717_);
 		}
-		return super.keyReleased(p_94715_, p_94716_, p_94717_);
+		return false;
 	}
 
+	@Override
 	public boolean charTyped(char p_94683_, int p_94684_) {
-		for (ScrollableWidget w : widgets()) {
-			if (w.charTyped(p_94683_, p_94684_))
-				return true;
+		if (visible) {
+			for (ScrollableWidget w : widgets()) {
+				if (w.charTyped(p_94683_, p_94684_))
+					return true;
+			}
+			return super.charTyped(p_94683_, p_94684_);
 		}
-		return super.charTyped(p_94683_, p_94684_);
+		return false;
 	}
 
 	@Override

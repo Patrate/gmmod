@@ -13,8 +13,25 @@ public class StatBlock {
 		this.statsPerLevel = new HashMap<Class<? extends Stat>, Integer>();
 	}
 
+	public StatBlock clone() {
+		StatBlock copy = new StatBlock();
+		for (Class<? extends Stat> statClass : this.statsPerLevel.keySet()) {
+			copy.statsPerLevel.put(statClass, this.statsPerLevel.get(statClass));
+		}
+		return copy;
+	}
+
+	public int getStatPerLevel(Class<? extends Stat> stat) {
+		if (statsPerLevel.containsKey(stat))
+			return statsPerLevel.get(stat);
+		return 0;
+	}
+
 	public void setStatPerLevel(Class<? extends Stat> stat, int bonus) {
-		statsPerLevel.put(stat, bonus);
+		if (bonus == 0)
+			statsPerLevel.remove(stat);
+		else
+			statsPerLevel.put(stat, bonus);
 	}
 
 	public Map<Class<? extends Stat>, Integer> getBonus(int level) {
